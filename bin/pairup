@@ -29,6 +29,16 @@ admin_user=${3:-$USER}
 # Set up ssh key for root. Needs root password:
 cat ~/.ssh/id_rsa.pub | ssh root@$ip_address "cat >> ~/.ssh/authorized_keys"
 
+#------------------------------------------------------------------------------
+# Now do the 'pair_user' stuff:
+#------------------------------------------------------------------------------
+
+pair_key=${0%/bin/*}/keys/$pair_user
+[[ -d $pair_key ]] && {
+  cat $pair_key | ssh root@$ip_address "cat >> ~/pair_key"
+}
+
+
 # Copy this setup script to root's $HOME.
 cat <<... | ssh root@$ip_address "cat > $setup_file_name"
 set -ex
@@ -38,7 +48,11 @@ rm $setup_file_name
 
 # Install needed software:
 apt-get update --yes
-apt-get install --yes git build-essential exuberant-ctags
+apt-get install --yes git build-essential exuberant-ctags libjson-perl libjson-xs-perl ack-grep cpanminus
+
+wget http://fishshell.com/files/2.0.0/linux/Ubuntu_12.10/x86_64/fish_2.0.0-201305151006_amd64.deb
+dpkg -i fish_2.0.0-201305151006_amd64.deb
+chsh -S /usr/local/bin/fish
 
 # Add users. sudo for $admin_user:
 addgroup admin
@@ -52,6 +66,12 @@ chmod 700 /home/$admin_user/.ssh
 mv ~/.ssh/authorized_keys /home/$admin_user/.ssh/
 chown -R $admin_user:$admin_user /home/$admin_user/.ssh/
 
+if [ -f $pair_key ]; then
+  mkdir -p /home/$pair_user/.ssh
+  chown $pair_user /home/$pair_user/.ssh
+  chmod 600 /home/$pair_user/.ssh
+  cp keys/$pair_user /home/$pair_user/.ssh/authorized_keys
+fi
 # TODO scramble root password
 ...
 
@@ -110,3 +130,5 @@ ssh -t $admin_user@$ip_address bash $setup_file_name
 
 # Now you should be inside a perfectly working tmux session for pairing.
 # Run the `pairup` command and it will tell you what your partner needs.
+
+# vim: set sw=2:
