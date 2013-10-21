@@ -1,0 +1,112 @@
+#!/bin/bash
+
+#------------------------------------------------------------------------------
+# I use this script to prep a new rackspace Ubuntu 12.04 server instance for
+# pair programming.
+#------------------------------------------------------------------------------
+
+set -e
+
+USAGE="Usage: ${0##*/} <ip-address> [<pair-user-id> [<admin-user-id>]]"
+
+die() { echo "$@" >&2; exit 1; }
+
+if [[ -z "$1" ]] || [[ ! "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    die "$USAGE"
+fi
+
+ip_address="$1"
+setup_file_name='~/server-setup.bash'
+pair_user=${2:-pair}
+admin_user=${3:-$USER}
+
+# die "ip=$ip_address pair=$pair_user admin=$admin_user"
+
+#------------------------------------------------------------------------------
+# Do the 'root' stuff first:
+#------------------------------------------------------------------------------
+
+# Set up ssh key for root. Needs root password:
+cat ~/.ssh/id_rsa.pub | ssh root@$ip_address "cat >> ~/.ssh/authorized_keys"
+
+# Copy this setup script to root's $HOME.
+cat <<... | ssh root@$ip_address "cat > $setup_file_name"
+set -ex
+
+# Remove this script:
+rm $setup_file_name
+
+# Install needed software:
+apt-get update --yes
+apt-get install --yes git build-essential exuberant-ctags
+
+# Add users. sudo for $admin_user:
+addgroup admin
+adduser $admin_user
+adduser $admin_user admin
+adduser $pair_user
+
+# Move the public key over to $admin_user's home:
+mkdir -p /home/$admin_user/.ssh
+chmod 700 /home/$admin_user/.ssh
+mv ~/.ssh/authorized_keys /home/$admin_user/.ssh/
+chown -R $admin_user:$admin_user /home/$admin_user/.ssh/
+
+# TODO scramble root password
+...
+
+# Run the interactive root script:
+ssh -t root@$ip_address bash $setup_file_name
+
+#------------------------------------------------------------------------------
+# Now do the 'admin_user' stuff:
+#------------------------------------------------------------------------------
+
+# Copy this setup script to $admin_user's $HOME.
+cat <<... | ssh $admin_user@$ip_address "cat > $setup_file_name"
+set -ex
+
+# Remove this script:
+rm $setup_file_name
+
+# Get the ... dotfile management software:
+git clone git://github.com/ingydotnet/....git
+
+# Configure ...:
+cat <<.... > .../conf
+install_method: symlink
+dots:
+- repo: git@github.com:sharpsaw/loop-dots.git
+- repo: git@github.com:sharpsaw/git-dots.git
+- repo: git@github.com:ingydotnet/misc-dots.git
+- repo: git@github.com:sharpsaw/sane-dots.git
+- repo: git@github.com:sharpsaw/tmux-dots.git
+- repo: git@github.com:sharpsaw/vim-dots.git
+- repo: git@github.com:ingydotnet/ubuntu-dots.git
+- repo: git@github.com:ingydotnet/ingy-dots.git
+....
+
+# Install ingy's basic config:
+.../... update
+.../... install
+
+# Get project software:
+git clone git://github.com/ingydotnet/lola ~/src/B/lola
+git clone git://github.com/ingydotnet/git-hub ~/src/B/git-hub
+
+cat <<.... > ~/bin/pairup
+chmod 777 /tmp/pairup
+echo 'ssh $pair_user@$ip_address'
+echo 'tmux -S /tmp/pairup attach'
+....
+chmod +x ~/bin/pairup
+
+# Start tmux with a shared socket:
+tmux -S /tmp/pairup
+...
+
+# Run the interactive admin_user script:
+ssh -t $admin_user@$ip_address bash $setup_file_name
+
+# Now you should be inside a perfectly working tmux session for pairing.
+# Run the `pairup` command and it will tell you what your partner needs.
