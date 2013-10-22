@@ -9,6 +9,8 @@ pkgs=(
   libjson-perl
   libjson-xs-perl
   tmux
+  tree
+  vim-nox
 )
 apt-get update --yes
 apt-get install --yes "${pkgs[@]}"
