@@ -1,24 +1,24 @@
 #!/bin/bash
 
 #------------------------------------------------------------------------------
-# I use this script to prep a new rackspace Ubuntu 12.04 server instance for
-# pair programming.
+# Setup a Debian-based VPS for remote pair hacking:
 #------------------------------------------------------------------------------
 
-set -e
+set -ex
 
-USAGE="Usage: ${0##*/} <ip-address> [<pair-user-id> [<admin-user-id>]]"
+USAGE="Usage: ${0##*/} <ip-address> <pair-user-id> [<admin-user-id>]"
 
 die() { echo "$@" >&2; exit 1; }
 
-if [[ -z "$1" ]] || [[ ! "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+if [ $# -lt 2 -o $# -gt 3 ] ||
+   [[ ! "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     die "$USAGE"
 fi
 
 ip_address="$1"
+pair_user="$2"
+admin_user="${3:-$USER}"
 setup_file_name='~/server-setup.bash'
-pair_user=${2:-pair}
-admin_user=${3:-$USER}
 
 # die "ip=$ip_address pair=$pair_user admin=$admin_user"
 
@@ -27,17 +27,16 @@ admin_user=${3:-$USER}
 #------------------------------------------------------------------------------
 
 # Set up ssh key for root. Needs root password:
-cat ~/.ssh/id_rsa.pub | ssh root@$ip_address "cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/id_rsa.pub | ssh root@$ip_address "cat > k; mkdir -p .ssh; chmod 700 .ssh; mv k .ssh/authorized_keys"
 
-#------------------------------------------------------------------------------
-# Now do the 'pair_user' stuff:
-#------------------------------------------------------------------------------
-
+# Copy over pair's key if present
 pair_key=${0%/bin/*}/keys/$pair_user
-[[ -d $pair_key ]] && {
-  cat $pair_key | ssh root@$ip_address "cat >> ~/pair_key"
-}
+if [ -e $pair_key ]; then
+  scp $pair_key root@$ip_address:pair_key
+fi
 
+# Copy over apt-get script:
+scp apt-get root@$ip_address:
 
 # Copy this setup script to root's $HOME.
 cat <<... | ssh root@$ip_address "cat > $setup_file_name"
@@ -47,31 +46,34 @@ set -ex
 rm $setup_file_name
 
 # Install needed software:
-apt-get update --yes
-apt-get install --yes git build-essential exuberant-ctags libjson-perl libjson-xs-perl ack-grep cpanminus
+bash ./apt-get
 
+# Setup fish:
 wget http://fishshell.com/files/2.0.0/linux/Ubuntu_12.10/x86_64/fish_2.0.0-201305151006_amd64.deb
 dpkg -i fish_2.0.0-201305151006_amd64.deb
-chsh -S /usr/local/bin/fish
+chsh -s /usr/local/bin/fish
 
 # Add users. sudo for $admin_user:
 addgroup admin
 adduser $admin_user
 adduser $admin_user admin
-adduser $pair_user
 
 # Move the public key over to $admin_user's home:
 mkdir -p /home/$admin_user/.ssh
 chmod 700 /home/$admin_user/.ssh
-mv ~/.ssh/authorized_keys /home/$admin_user/.ssh/
-chown -R $admin_user:$admin_user /home/$admin_user/.ssh/
+cp ~/.ssh/authorized_keys /home/$admin_user/.ssh/
+chown -R $admin_user:$admin_user /home/$admin_user/.ssh
 
-if [ -f $pair_key ]; then
+if [ -f pair_key ]; then
+  adduser --disabled-password $pair_user
   mkdir -p /home/$pair_user/.ssh
-  chown $pair_user /home/$pair_user/.ssh
-  chmod 600 /home/$pair_user/.ssh
-  cp keys/$pair_user /home/$pair_user/.ssh/authorized_keys
+  chmod 700 /home/$pair_user/.ssh
+  mv pair_key /home/$pair_user/.ssh/authorized_keys
+  chown -R $pair_user:$pair_user /home/$pair_user/.ssh
+else
+  adduser $pair_user
 fi
+
 # TODO scramble root password
 ...
 
@@ -82,6 +84,9 @@ ssh -t root@$ip_address bash $setup_file_name
 # Now do the 'admin_user' stuff:
 #------------------------------------------------------------------------------
 
+# Copy over files
+scp conf... github-repos $admin_user@$ip_address:
+
 # Copy this setup script to $admin_user's $HOME.
 cat <<... | ssh $admin_user@$ip_address "cat > $setup_file_name"
 set -ex
@@ -89,35 +94,31 @@ set -ex
 # Remove this script:
 rm $setup_file_name
 
-# Get the ... dotfile management software:
+# Get this repo remotely
+git clone git@github.com:ingydotnet/pairup-bash
+
+# Get other repos of interest
+while read repo; do
+  git clone git@github.com:\$repo src/\${repo#*/}
+done < github-repos
+rm github-repos
+
+# Install ... dotfile management setup:
 git clone git://github.com/ingydotnet/....git
-
-# Configure ...:
-cat <<.... > .../conf
-install_method: symlink
-dots:
-- repo: git@github.com:sharpsaw/loop-dots.git
-- repo: git@github.com:sharpsaw/git-dots.git
-- repo: git@github.com:ingydotnet/misc-dots.git
-- repo: git@github.com:sharpsaw/sane-dots.git
-- repo: git@github.com:sharpsaw/tmux-dots.git
-- repo: git@github.com:sharpsaw/vim-dots.git
-- repo: git@github.com:ingydotnet/ubuntu-dots.git
-- repo: git@github.com:ingydotnet/ingy-dots.git
-....
-
-# Install ingy's basic config:
+mv conf... .../conf
 .../... update
 .../... install
 
-# Get project software:
-git clone git://github.com/ingydotnet/lola ~/src/B/lola
-git clone git://github.com/ingydotnet/git-hub ~/src/B/git-hub
-
+# Make a little remote script called pairup. Run this first thing to get your
+# bearings inside the VPS:
 cat <<.... > ~/bin/pairup
 chmod 777 /tmp/pairup
-echo 'ssh $pair_user@$ip_address'
-echo 'tmux -S /tmp/pairup attach'
+cat <<.....
+Welcome to your new pairup VPS tmux session!
+Tell your pair programmer these details:
+ssh $pair_user@$ip_address
+tmux -S /tmp/pairup attach
+.....
 ....
 chmod +x ~/bin/pairup
 
@@ -130,5 +131,3 @@ ssh -t $admin_user@$ip_address bash $setup_file_name
 
 # Now you should be inside a perfectly working tmux session for pairing.
 # Run the `pairup` command and it will tell you what your partner needs.
-
-# vim: set sw=2:

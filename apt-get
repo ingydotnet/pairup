@@ -1,0 +1,14 @@
+#!/bin/bash
+
+pkgs=(
+  ack-grep
+  build-essential
+  cpanminus
+  exuberant-ctags
+  git
+  libjson-perl
+  libjson-xs-perl
+  tmux
+)
+apt-get update --yes
+apt-get install --yes "${pkgs[@]}"

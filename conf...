@@ -1,0 +1,10 @@
+install_method: symlink
+dots:
+- repo: git@github.com:sharpsaw/loop-dots.git
+- repo: git@github.com:sharpsaw/git-dots.git
+- repo: git@github.com:ingydotnet/misc-dots.git
+- repo: git@github.com:sharpsaw/sane-dots.git
+- repo: git@github.com:sharpsaw/tmux-dots.git
+- repo: git@github.com:sharpsaw/vim-dots.git
+- repo: git@github.com:ingydotnet/ubuntu-dots.git
+- repo: git@github.com:ingydotnet/ingy-dots.git
