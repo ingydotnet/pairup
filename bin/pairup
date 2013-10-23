@@ -76,7 +76,7 @@ fi
 ...
 
 # Run the interactive root script:
-# ssh -t root@$ip_address bash $setup_file_name
+ssh -t root@$ip_address bash $setup_file_name
 
 #------------------------------------------------------------------------------
 # Now do the 'admin_user' stuff:
