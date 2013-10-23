@@ -20,8 +20,6 @@ pair_user="$2"
 admin_user="${3:-$USER}"
 setup_file_name='~/server-setup.bash'
 
-# die "ip=$ip_address pair=$pair_user admin=$admin_user"
-
 #------------------------------------------------------------------------------
 # Do the 'root' stuff first:
 #------------------------------------------------------------------------------
@@ -51,12 +49,12 @@ bash ./apt-get
 # Setup fish:
 wget http://fishshell.com/files/2.0.0/linux/Ubuntu_12.10/x86_64/fish_2.0.0-201305151006_amd64.deb
 dpkg -i fish_2.0.0-201305151006_amd64.deb
-chsh -s /usr/local/bin/fish
 
 # Add users. sudo for $admin_user:
 addgroup admin
 adduser $admin_user
 adduser $admin_user admin
+chsh -s /usr/local/bin/fish $admin_user
 
 # Move the public key over to $admin_user's home:
 mkdir -p /home/$admin_user/.ssh
