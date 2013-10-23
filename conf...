@@ -7,5 +7,6 @@ dots:
 - repo: git@github.com:sharpsaw/tmux-dots.git
 - repo: git@github.com:sharpsaw/vim-dots.git
 - repo: git@github.com:sharpsaw/fish-dots.git
+- repo: git@github.com:ingydotnet/local-lang-dots.git
 - repo: git@github.com:ingydotnet/ubuntu-dots.git
 - repo: git@github.com:ingydotnet/ingy-dots.git
