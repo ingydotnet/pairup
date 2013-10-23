@@ -54,7 +54,7 @@ dpkg -i fish_2.0.0-201305151006_amd64.deb
 addgroup admin
 adduser $admin_user
 adduser $admin_user admin
-chsh -s /usr/local/bin/fish $admin_user
+# chsh -s /usr/bin/fish $admin_user
 
 # Move the public key over to $admin_user's home:
 mkdir -p /home/$admin_user/.ssh
@@ -76,7 +76,7 @@ fi
 ...
 
 # Run the interactive root script:
-ssh -t root@$ip_address bash $setup_file_name
+# ssh -t root@$ip_address bash $setup_file_name
 
 #------------------------------------------------------------------------------
 # Now do the 'admin_user' stuff:
