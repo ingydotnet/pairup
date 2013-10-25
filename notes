@@ -1,3 +1,10 @@
-- setup plenv
 - build perls
+- preconfig git-hub
 
+
+== Current Projects
+- YAML::Tiny
+- git hub commands # list commands
+- git hub travis plugin
+- git hub bpan
+- rackspace-api-bash
