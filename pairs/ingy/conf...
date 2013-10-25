@@ -1,0 +1,4 @@
+- repo: git@github.com:ingydotnet/local-lang-dots.git
+- repo: git@github.com:ingydotnet/ubuntu-dots.git
+- repo: git@github.com:ingydotnet/ingy-dots.git
+- repo: git@github.com:ingydotnet/pairup-dots.git

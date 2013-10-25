@@ -1,0 +1,7 @@
+#!/bin/bash
+
+sudo true
+sudo apt-get install perl-doc
+
+# setup plenv and build perls
+# install dz

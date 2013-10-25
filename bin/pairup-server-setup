@@ -28,7 +28,7 @@ setup_file_name='~/server-setup.bash'
 cat ~/.ssh/id_rsa.pub | ssh root@$ip_address "cat > k; mkdir -p .ssh; chmod 700 .ssh; mv k .ssh/authorized_keys"
 
 # Copy over pair's key if present
-pair_key=${0%/bin/*}/keys/$pair_user
+pair_key=${0%/bin/*}/pairs/$pair_user/id_rsa.pub
 if [ -e $pair_key ]; then
   scp $pair_key root@$ip_address:pair_key
 fi
@@ -84,6 +84,15 @@ ssh -t root@$ip_address bash $setup_file_name
 
 # Copy over files
 scp conf... github-repos $admin_user@$ip_address:
+if [ -f pairs/$admin_user/conf... ]; then
+  cat pairs/$admin_user/conf... | ssh $admin_user@$ip_address "cat >> conf..."
+fi
+if [ -f pairs/$pair_user/conf... ]; then
+  cat pairs/$pair_user/conf... | ssh $admin_user@$ip_address "cat >> conf..."
+fi
+if [ -f pairs/private/conf... ]; then
+  cat pairs/private/conf... | ssh $admin_user@$ip_address "cat >> conf..."
+fi
 
 # Copy this setup script to $admin_user's $HOME.
 cat <<... | ssh $admin_user@$ip_address "cat > $setup_file_name"
@@ -119,6 +128,8 @@ tmux -S /tmp/pairup attach
 .....
 ....
 chmod +x ~/bin/pairup
+
+sudo ~/pairup-bash/bin/pairup-server-setup-more &> /tmp/pairup.log &
 
 # Start tmux with a shared socket:
 tmux -S /tmp/pairup
