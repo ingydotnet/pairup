@@ -1,8 +1,12 @@
 ingydotnet/bpan-bash
+ingydotnet/example-bash
 ingydotnet/git-hub
 ingydotnet/io-all-pm
 ingydotnet/lola
 ingydotnet/mo-pm
 ingydotnet/pairup-bash
 ingydotnet/test-more-bash
+ingydotnet/testml-pm
+ingydotnet/yaml-spec-tml
+
 Perl-Toolchain-Gang/YAML-Tiny
