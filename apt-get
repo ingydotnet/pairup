@@ -14,3 +14,7 @@ pkgs=(
 )
 apt-get update --yes
 apt-get install --yes "${pkgs[@]}"
+
+cp $(dirname $0)/bin/pairup /usr/local/bin/
+ln -s /usr/bin/ack-grep /usr/local/bin/ack
+
