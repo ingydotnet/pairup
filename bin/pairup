@@ -1,0 +1,3 @@
+#!/bin/bash
+
+tmux -S /tmp/pairup attach || tmux -S /tmp/pairup

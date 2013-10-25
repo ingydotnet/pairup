@@ -3,5 +3,7 @@
 (cd ~/src/git-hub; git submodule update --init; make install)
 apt-get install perl-doc
 
+cp $(dirname $0)/pairup /usr/local/bin/
+
 # setup plenv and build perls
 # install dz
