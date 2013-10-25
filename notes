@@ -4,6 +4,9 @@
 
 == Current Projects
 - YAML::Tiny
+- git-hub Makefile
+  - automatic submodule stuff
+  - DESTDIR
 - git hub commands # list commands
 - git hub travis plugin
 - git hub bpan

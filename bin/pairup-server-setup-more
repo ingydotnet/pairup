@@ -1,7 +1,7 @@
 #!/bin/bash
 
-sudo true
-sudo apt-get install perl-doc
+(cd ~/src/git-hub; git submodule update --init; make install)
+apt-get install perl-doc
 
 # setup plenv and build perls
 # install dz
