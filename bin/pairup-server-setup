@@ -106,6 +106,7 @@ git clone git@github.com:ingydotnet/pairup-bash
 
 # Get other repos of interest
 while read repo; do
+  [ -z "\$repo" ] && continue
   git clone git@github.com:\$repo src/\${repo#*/}
 done < github-repos
 rm github-repos
