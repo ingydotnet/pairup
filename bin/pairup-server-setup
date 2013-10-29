@@ -25,16 +25,14 @@ setup_file_name='~/server-setup.bash'
 #------------------------------------------------------------------------------
 
 # Set up ssh key for root. Needs root password:
-cat ~/.ssh/id_rsa.pub | ssh root@$ip_address "cat > k; mkdir -p .ssh; chmod 700 .ssh; mv k .ssh/authorized_keys"
+cat ~/.ssh/id_rsa.pub | ssh root@$ip_address \
+  "cat > k; mkdir -p .ssh; chmod 700 .ssh; mv k .ssh/authorized_keys"
 
 # Copy over pair's key if present
-pair_key=${0%/bin/*}/pairs/$pair_user/id_rsa.pub
+pair_key=${0%/bin/*}/user/$pair_user/id_rsa.pub
 if [ -e $pair_key ]; then
   scp $pair_key root@$ip_address:pair_key
 fi
-
-# Copy over apt-get script:
-scp apt-get root@$ip_address:
 
 # Copy this setup script to root's $HOME.
 cat <<... | ssh root@$ip_address "cat > $setup_file_name"
@@ -43,24 +41,17 @@ set -ex
 # Remove this script:
 rm $setup_file_name
 
-# Install needed software:
-bash ./apt-get
-
-# Setup fish:
-wget http://fishshell.com/files/2.0.0/linux/Ubuntu_12.10/x86_64/fish_2.0.0-201305151006_amd64.deb
-dpkg -i fish_2.0.0-201305151006_amd64.deb
-
 # Add users. sudo for $admin_user:
 addgroup admin
 adduser $admin_user
 adduser $admin_user admin
-# chsh -s /usr/bin/fish $admin_user
 
 # Move the public key over to $admin_user's home:
 mkdir -p /home/$admin_user/.ssh
 chmod 700 /home/$admin_user/.ssh
 cp ~/.ssh/authorized_keys /home/$admin_user/.ssh/
 chown -R $admin_user:$admin_user /home/$admin_user/.ssh
+# TODO make sudo passwordless:
 
 if [ -f pair_key ]; then
   adduser --disabled-password $pair_user
@@ -71,6 +62,19 @@ if [ -f pair_key ]; then
 else
   adduser $pair_user
 fi
+
+# Install requested software:
+apt-get install git
+git clone git@github.com:ingydotnet/pairup-bash pairup
+bash ./pairup/bin/install
+if [ -f ./pairup/user/$admin_user/install ]; then
+  bash ./pairup/user/$admin_user/install
+fi
+if [ -f ./pairup/user/$pair_user/install ]; then
+  bash ./pairup/user/$pair_user/install
+fi
+
+rm -fr pairup
 
 # TODO scramble root password
 ...
@@ -83,15 +87,16 @@ ssh -t root@$ip_address bash $setup_file_name
 #------------------------------------------------------------------------------
 
 # Copy over files
-scp conf... github-repos $admin_user@$ip_address:
-if [ -f pairs/$admin_user/conf... ]; then
-  cat pairs/$admin_user/conf... | ssh $admin_user@$ip_address "cat >> conf..."
+dots=conf...
+scp $dots github-repos $admin_user@$ip_address:
+if [ -f user/$admin_user/$dots ]; then
+  cat user/$admin_user/$dots | ssh $admin_user@$ip_address "cat >> $dots"
 fi
-if [ -f pairs/$pair_user/conf... ]; then
-  cat pairs/$pair_user/conf... | ssh $admin_user@$ip_address "cat >> conf..."
+if [ -f user/$pair_user/$dots ]; then
+  cat user/$pair_user/$dots | ssh $admin_user@$ip_address "cat >> $dots"
 fi
-if [ -f pairs/private/conf... ]; then
-  cat pairs/private/conf... | ssh $admin_user@$ip_address "cat >> conf..."
+if [ -f user/private/$dots ]; then
+  cat user/private/$dots | ssh $admin_user@$ip_address "cat >> $dots"
 fi
 
 # Copy this setup script to $admin_user's $HOME.
@@ -102,7 +107,8 @@ set -ex
 rm $setup_file_name
 
 # Get this repo remotely
-git clone git@github.com:ingydotnet/pairup-bash
+git clone git@github.com:ingydotnet/pairup-bash pairup
+cp -p ~/pairup/bin/* ~/bin/
 
 # Get other repos of interest
 while read repo; do
@@ -113,24 +119,29 @@ rm github-repos
 
 # Install ... dotfile management setup:
 git clone git://github.com/ingydotnet/....git
-mv conf... .../conf
+mv $dots .../conf
 .../... update
 .../... install
 
-# Make a little remote script called pairup. Run this first thing to get your
+# Make a little remote script called 'PairUp'. Run this first thing to get your
 # bearings inside the VPS:
-cat <<.... > ~/bin/pairup
+cat <<.... > ~/bin/PairUp
 chmod 777 /tmp/pairup
 cat <<.....
 Welcome to your new pairup VPS tmux session!
-Tell your pair programmer these details:
-ssh $pair_user@$ip_address
-pairup
+
+Tell your pair programmer to run these commands:
+
+    ssh $pair_user@$ip_address
+    pairup
+
+You may want to run this command now:
+
+    pairup-server-setup-more &> /tmp/pairup-server-setup-more.log &
+
 .....
 ....
-chmod +x ~/bin/pairup
-
-sudo ~/pairup-bash/bin/pairup-server-setup-more &> /tmp/pairup.log &
+chmod +x ~/bin/PairUp
 
 # Start tmux with a shared socket:
 tmux -S /tmp/pairup
@@ -140,4 +151,4 @@ tmux -S /tmp/pairup
 ssh -t $admin_user@$ip_address bash $setup_file_name
 
 # Now you should be inside a perfectly working tmux session for pairing.
-# Run the `pairup` command and it will tell you what your partner needs.
+# Run the `PairUp` command and it will tell you what your partner needs.
