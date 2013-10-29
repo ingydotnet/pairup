@@ -1,2 +1,3 @@
 - repo: git@github.com:sharpsaw/fish-dots.git
 - repo: git@github.com:carloslima/pairup-dots.git
+  path: carlos-pairup-dots

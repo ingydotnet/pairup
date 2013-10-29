@@ -51,7 +51,8 @@ mkdir -p /home/$admin_user/.ssh
 chmod 700 /home/$admin_user/.ssh
 cp ~/.ssh/authorized_keys /home/$admin_user/.ssh/
 chown -R $admin_user:$admin_user /home/$admin_user/.ssh
-# TODO make sudo passwordless:
+
+# TODO make sudo passwordless.
 
 if [ -f pair_key ]; then
   adduser --disabled-password $pair_user
