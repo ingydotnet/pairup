@@ -90,7 +90,7 @@ ssh -t root@$ip_address bash $setup_file_name
 
 # Copy over files
 dots=conf...
-scp $dots github-repos $admin_user@$ip_address:
+scp conf/$dots conf/github-repos $admin_user@$ip_address:
 if [ -f user/$admin_user/$dots ]; then
   cat user/$admin_user/$dots | ssh $admin_user@$ip_address "cat >> $dots"
 fi
@@ -110,6 +110,7 @@ rm $setup_file_name
 
 # Get this repo remotely
 git clone git@github.com:ingydotnet/pairup-bash pairup
+mkdir -p ~/bin
 cp -p ~/pairup/bin/* ~/bin/
 
 # Get other repos of interest
