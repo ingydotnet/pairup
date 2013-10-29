@@ -11,7 +11,7 @@ pkgs=(
   tree
   vim-nox
 )
-apt-get update --yes
 apt-get install --yes "${pkgs[@]}"
 
+# Symlink ack to ack-grep
 ln -s /usr/bin/ack-grep /usr/local/bin/ack
