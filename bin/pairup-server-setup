@@ -18,25 +18,67 @@ fi
 ip_address="$1"
 pair_user="$2"
 admin_user="${3:-$USER}"
-setup_file_name='~/server-setup.bash'
+setup_file_name='~/pairup-setup.bash'
+
+# cd to the pairup repo:
+pairup_bin="$0"
+[[ "$pairup_bin" =~ ^bin/[A-Za-z0-9_-]+$ ]] &&
+  pairup_bin="./$pairup_bin"
+[[ "$pairup_bin" =~ .+/bin/[A-Za-z0-9_-]+$ ]] ||
+  die "Invalid invocation path: '$pairup_bin'"
+cd ${pairup_bin%/bin/*} ||
+  die "Can't cd to pairup repo"
+
+# Get the repo name to use:
+pairup_repo="$(git remote -v | grep -E '^origin' | head -n1)"
+[ -n "$pairup_repo" ] ||
+  die "Can't find remote"
+[[ "$pairup_repo" =~ ([^ ]*github\.com[:/][^ ]*) ]] ||
+  die "'$pairup_repo' is bad repo name"
+pairup_repo=$BASH_REMATCH[1]
+[[ "$pairup_repo" =~ github\.com ]] ||
+  die "'$pairup_repo' is bad repo name"
+
+#------------------------------------------------------------------------------
+# Create local config build:
+#------------------------------------------------------------------------------
+
+# Copy over default and user files:
+rm -fr build
+cp -r conf build
+
+for user in "$admin_user" "$pair_user" private; do
+  for file in conf... github-repos install known_hosts ssh-config; do
+    if [ -e "user/$user/$file" ]; then
+      cat "user/$user/$file" >> "build/$file"
+    fi
+  done
+done
 
 #------------------------------------------------------------------------------
 # Do the 'root' stuff first:
 #------------------------------------------------------------------------------
 
 # Set up ssh key for root. Needs root password:
-admin_key=${0%/bin/*}/user/$admin_user/id_rsa.pub
-[ -f $admin_key ] || { echo "no admin key XXX" >&2; exit 86; }
-cat $admin_key | ssh root@$ip_address \
-  "cat > k; mkdir -p .ssh; chmod 700 .ssh; mv k .ssh/authorized_keys"
+admin_key=user/$admin_user/id_rsa.pub
+if [ ! -e "$admin_key" ]; then
+  admin_key=~/.ssh/id_rsa.pub
+fi
+if [ -e "$admin_key" ]; then
+  cat $admin_key | ssh root@$ip_address \
+    "cat > k; mkdir -p .ssh; chmod 700 .ssh; mv k .ssh/authorized_keys"
+fi
 
-# Copy over pair's key if present
-pair_key=${0%/bin/*}/user/$pair_user/id_rsa.pub
+# Copy over known hosts:
+scp build/known_hosts root@$ip_address:.ssh/known_hosts
+
+# Copy over pair's key if present:
+pair_key=user/$pair_user/id_rsa.pub
 if [ -e $pair_key ]; then
   scp $pair_key root@$ip_address:pair_key
 fi
 
-# Copy this setup script to root's $HOME.
+# Copy this setup script to root's $HOME:
 cat <<... | ssh root@$ip_address "cat > $setup_file_name"
 set -ex
 
@@ -66,22 +108,22 @@ else
   adduser $pair_user
 fi
 
-# Install requested software:
+# Get git:
 apt-get update --yes
 apt-get install git --yes
-git clone git@github.com:ingydotnet/pairup-bash pairup
-bash ./pairup/conf/install
-if [ -f ./pairup/user/$admin_user/install ]; then
-  bash ./pairup/user/$admin_user/install
-fi
-if [ -f ./pairup/user/$pair_user/install ]; then
-  bash ./pairup/user/$pair_user/install
-fi
 
-rm -fr pairup
+# Clone this repo, and put the tools in the PATH:
+git clone $pairup_repo pairup
+cp -p pairup/bin/* /usr/local/bin/
+
+# Install requested software:
+bash build/install
 
 # TODO scramble root password
 ...
+
+# Copy build dir over to root:
+scp -r build root@$ip_address:
 
 # Run the interactive root script:
 ssh -t root@$ip_address bash $setup_file_name
@@ -90,18 +132,12 @@ ssh -t root@$ip_address bash $setup_file_name
 # Now do the 'admin_user' stuff:
 #------------------------------------------------------------------------------
 
-# Copy over files
-dots=conf...
-scp conf/$dots conf/github-repos $admin_user@$ip_address:
-if [ -f user/$admin_user/$dots ]; then
-  cat user/$admin_user/$dots | ssh $admin_user@$ip_address "cat >> $dots"
-fi
-if [ -f user/$pair_user/$dots ]; then
-  cat user/$pair_user/$dots | ssh $admin_user@$ip_address "cat >> $dots"
-fi
-if [ -f user/private/$dots ]; then
-  cat user/private/$dots | ssh $admin_user@$ip_address "cat >> $dots"
-fi
+# Copy over known_hosts and config to .ssh/:
+scp build/known_hosts $admin_user@$ip_address:.ssh/known_hosts
+scp build/ssh-config $admin_user@$ip_address:.ssh/config
+
+# Copy build dir over to $admin_user:
+scp -r build $admin_user@$ip_address:
 
 # Copy this setup script to $admin_user's $HOME.
 cat <<... | ssh $admin_user@$ip_address "cat > $setup_file_name"
@@ -111,20 +147,18 @@ set -ex
 rm $setup_file_name
 
 # Get this repo remotely
-git clone git@github.com:ingydotnet/pairup-bash pairup
-mkdir -p ~/bin
-cp -p ~/pairup/bin/* ~/bin/
+git clone $pairup_repo pairup
 
 # Get other repos of interest
 while read repo; do
   [ -z "\$repo" ] && continue
   git clone git@github.com:\$repo src/\${repo#*/}
-done < github-repos
-rm github-repos
+done < build/github-repos
 
 # Install ... dotfile management setup:
+# TODO move from ingydotnet to sharsaw
 git clone git://github.com/ingydotnet/....git
-mv $dots .../conf
+mv build/conf... .../conf
 .../... update
 .../... install
 
@@ -135,14 +169,14 @@ chmod 777 /tmp/pairup
 cat <<.....
 Welcome to your new pairup VPS tmux session!
 
-Tell your pair programmer to run these commands:
+Tell $pair_user to run these commands:
 
     ssh $pair_user@$ip_address
     pairup
 
 You may want to run this command now:
 
-    pairup-server-setup-more &> /tmp/pairup-server-setup-more.log &
+    sudo pairup-server-setup-more &> /tmp/pairup-server-setup-more.log &
 
 .....
 ....
