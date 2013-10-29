@@ -25,7 +25,9 @@ setup_file_name='~/server-setup.bash'
 #------------------------------------------------------------------------------
 
 # Set up ssh key for root. Needs root password:
-cat ~/.ssh/id_rsa.pub | ssh root@$ip_address \
+admin_key=${0%/bin/*}/user/$admin_user/id_rsa.pub
+[ -f $admin_key ] || { echo "no admin key XXX" >&2; exit 86; }
+cat $admin_key | ssh root@$ip_address \
   "cat > k; mkdir -p .ssh; chmod 700 .ssh; mv k .ssh/authorized_keys"
 
 # Copy over pair's key if present
