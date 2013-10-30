@@ -16,3 +16,7 @@ Typical contents are:
 Most of those files are snippets that are concatenated with your pair
 programmers snippets and the default PairUp snippets found in the ../conf/
 directory.
+
+If you have private stuff to not publish on github, put it under the ./private/
+directory using the same names. Thhe private directory gets merged in if it
+exists.
