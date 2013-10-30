@@ -2,14 +2,11 @@
 
 pkgs=(
   ack-grep
-  apti autoreconf
   build-essential
   cpanminus
   exuberant-ctags
   libjson-perl
   libjson-xs-perl
-  libtool
-  pkg-config
   tmux
   tree
   vim-nox

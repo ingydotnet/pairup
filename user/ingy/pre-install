@@ -1,0 +1,7 @@
+pkgs=(
+  autoreconf
+  libtool
+  libssl-dev
+  pkg-config
+)
+apt-get install --yes "${pkgs[@]}"
