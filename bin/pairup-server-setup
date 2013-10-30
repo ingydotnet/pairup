@@ -1,10 +1,12 @@
 #!/bin/bash
 
 #------------------------------------------------------------------------------
-# Setup a Debian-based VPS for remote pair hacking:
+# Setup a Debian-based VPS for remote pair hacking.
+#
+# It is tested on Ubuntu 12.04.
 #------------------------------------------------------------------------------
 
-set -ex
+set -e
 
 USAGE="Usage: ${0##*/} <ip-address> <pair-user-id> [<admin-user-id>]"
 
@@ -35,7 +37,7 @@ pairup_repo="$(git remote -v | grep -E '^origin' | head -n1)"
   die "Can't find remote"
 [[ "$pairup_repo" =~ ([^ ]*github\.com[:/][^ ]*) ]] ||
   die "'$pairup_repo' is bad repo name"
-pairup_repo=$BASH_REMATCH[1]
+pairup_repo=${BASH_REMATCH[1]}
 [[ "$pairup_repo" =~ github\.com ]] ||
   die "'$pairup_repo' is bad repo name"
 
@@ -54,6 +56,8 @@ for user in "$admin_user" "$pair_user" private; do
     fi
   done
 done
+
+set -x
 
 #------------------------------------------------------------------------------
 # Do the 'root' stuff first:
