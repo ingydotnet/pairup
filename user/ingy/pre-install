@@ -3,5 +3,6 @@ pkgs=(
   libtool
   libssl-dev
   pkg-config
+  tig
 )
 apt-get install --yes "${pkgs[@]}"
