@@ -32,12 +32,9 @@ cd ${pairup_bin%/bin/*} ||
   die "Can't cd to pairup repo"
 
 # Get the repo name to use:
-pairup_repo="$(git remote -v | grep -E '^origin' | head -n1)"
+pairup_repo="$(git remote -v | grep -E '^origin' | head -n1 | cut -f2 | cut -d ' ' -f1)"
 [ -n "$pairup_repo" ] ||
   die "Can't find remote"
-[[ "$pairup_repo" =~ ([^ ]*github\.com[:/][^ ]*) ]] ||
-  die "'$pairup_repo' is bad repo name"
-pairup_repo=${BASH_REMATCH[1]}
 [[ "$pairup_repo" =~ github\.com ]] ||
   die "'$pairup_repo' is bad repo name"
 
