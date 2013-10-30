@@ -47,7 +47,7 @@ rm -fr build
 cp -r conf build
 
 for user in "$admin_user" "$pair_user" private; do
-  for file in conf... github-repos install known_hosts ssh-config; do
+  for file in conf... github-repos known_hosts pre-install post-install ssh-config; do
     if [ -e "user/$user/$file" ]; then
       cat "user/$user/$file" >> "build/$file"
     fi
@@ -97,8 +97,6 @@ chmod 700 /home/$admin_user/.ssh
 cp ~/.ssh/authorized_keys /home/$admin_user/.ssh/
 chown -R $admin_user:$admin_user /home/$admin_user/.ssh
 
-# TODO make sudo passwordless.
-
 if [ -f pair_key ]; then
   adduser --disabled-password $pair_user
   mkdir -p /home/$pair_user/.ssh
@@ -118,7 +116,11 @@ git clone $pairup_repo pairup
 cp -p pairup/bin/* /usr/local/bin/
 
 # Install requested software:
-bash build/install
+bash build/pre-install
+
+if [ -n "$PAIRUP_NO_SUDO_PASSWORD" ]; then
+  echo "ALL ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+fi
 
 # TODO scramble root password
 ...
@@ -153,12 +155,12 @@ git clone $pairup_repo pairup
 # Get other repos of interest
 while read repo; do
   [ -z "\$repo" ] && continue
-  git clone git@github.com:\$repo src/\${repo#*/}
+  git clone git@github.com:\$repo src/\${repo#*/} || true
 done < build/github-repos
 
 # Install ... dotfile management setup:
 # TODO move from ingydotnet to sharsaw
-git clone git://github.com/ingydotnet/....git
+git clone git@github.com:ingydotnet/....git
 mv build/conf... .../conf
 .../... update
 .../... install
@@ -167,17 +169,18 @@ mv build/conf... .../conf
 # your bearings inside the VPS:
 cat <<.... > ~/bin/PairUp
 chmod 777 /tmp/pairup
+
+set -x
+sudo bash build/post-install &> /tmp/pairup-post-install.log &
+set +x
+
 cat <<.....
-Welcome to your new pairup VPS tmux session!
+Welcome to your new PairUp VPS tmux session!
 
 Tell $pair_user to run these commands:
 
     ssh $pair_user@$ip_address
     pairup
-
-You may want to run this command now:
-
-    sudo pairup-server-setup-more &> /tmp/pairup-server-setup-more.log &
 
 .....
 ....
@@ -185,6 +188,11 @@ chmod +x ~/bin/PairUp
 
 # Start tmux with a shared socket:
 tmux -S /tmp/pairup
+
+# TODO - Figure out tmux startup script
+- MOTD
+- post-install
+- Split screen, irssi
 ...
 
 # Run the interactive admin_user script:

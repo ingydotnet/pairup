@@ -1,0 +1,5 @@
+local-lang plenv-install
+local-lang rbenv-install
+local-lang nvm-install
+
+cpanm XXX YAML::XS IO::All
