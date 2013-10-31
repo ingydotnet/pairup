@@ -24,8 +24,6 @@ main() {
   set -x
 
   root-setup
-  # Copy Build dir over to root:
-  scp -r Build $root_user@$ip_address:
   # Run the interactive root script:
   ssh -t $root_user@$ip_address bash $setup_file_name
 
@@ -122,8 +120,8 @@ root-setup() {
       "cat > k; mkdir -p .ssh; chmod 700 .ssh; mv k .ssh/authorized_keys"
   fi
 
-  # Copy over known hosts:
-  scp Build/known_hosts "$root_user@$ip_address:.ssh/known_hosts"
+  # Copy Build dir over to root:
+  scp -r Build $root_user@$ip_address:
 
   # Copy over pair's key if present:
   pair_key="user/$pair_user/id_rsa.pub"
@@ -135,7 +133,13 @@ root-setup() {
   cat <<... | ssh $root_user@$ip_address "cat > $setup_file_name"
 #!/bin/bash
 
-continue?() { echo -c "Error. ctl-c to exit. Enter to continue."; read; }
+continue?() {
+  set +x
+  echo -n "Error. ctl-c to exit. Enter to continue."
+  read
+  set -x
+  :
+}
 
 set -ex
 
@@ -174,6 +178,9 @@ rm $setup_file_name
   fi
 }
 
+# Copy known hosts to .ssh/:
+cp Build/known_hosts .ssh/known_hosts
+
 # Get git:
 {
   apt-get update --yes
@@ -189,7 +196,7 @@ rm $setup_file_name
   # apt-get install requested packages:
   apt-get-install() {
     for pkg; do
-      apt-get install --yes "$pkg" || continue?
+      apt-get install --yes $pkg || continue?
     done
   }
 
