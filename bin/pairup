@@ -138,7 +138,6 @@ continue?() {
   echo -n "Error. ctl-c to exit. Enter to continue."
   read
   set -x
-  :
 }
 
 set -ex
@@ -151,6 +150,7 @@ rm $setup_file_name
   addgroup admin || continue?
   adduser --gecos '' $admin_user || continue?
   adduser $admin_user admin || continue?
+  :
 }
 
 # Move the public key over to $admin_user's home:
@@ -196,7 +196,7 @@ cp Build/known_hosts .ssh/known_hosts
   # apt-get install requested packages:
   apt-get-install() {
     for pkg; do
-      apt-get install --yes $pkg || continue?
+      apt-get install --yes "\$pkg" || continue?
     done
   }
 
@@ -225,23 +225,33 @@ admin-setup() {
 
   # Copy this setup script to $admin_user's $HOME.
   cat <<... | ssh $admin_user@$ip_address "cat > $setup_file_name"
+#!/bin/bash
+
+continue?() {
+  set +x
+  echo -n "Error. ctl-c to exit. Enter to continue."
+  read
+  set -x
+}
+
 set -ex
 
 # Remove this script:
 rm $setup_file_name
 
 # Get this repo remotely
-git clone $pairup_repo pairup
+git clone $pairup_repo pairup || continue?
 
 # Get other repos of interest
 while read repo; do
   [ -z "\$repo" ] && continue
-  git clone git@github.com:\$repo src/\${repo#*/} || true
+  git clone git@github.com:\$repo src/\${repo#*/} || continue?
+  :
 done < Build/github-repos
 
 # Install ... dotfile management setup:
 # TODO move from ingydotnet to sharsaw
-git clone git@github.com:ingydotnet/....git
+git clone git@github.com:ingydotnet/....git || continue?
 mv Build/conf... .../conf
 .../... update
 .../... install
@@ -270,10 +280,15 @@ chmod +x ~/bin/PairInfo
 # Start tmux with a shared socket:
 tmux -S /tmp/pairup
 
+echo Reconnect to PairUp with:
+echo
+echo     ssh -t $ip_address PairUp
+echo
+
 # TODO - Figure out tmux startup script
-- MOTD
-- post-install
-- Split screen, irssi
+# - MOTD
+# - post-install
+# - Split screen, irssi
 ...
 }
 
