@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Delete a new rackspace server instance
+
+echo "$0 not implemented yet" >&2
+
+exit 1
