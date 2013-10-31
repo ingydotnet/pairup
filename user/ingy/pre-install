@@ -9,4 +9,4 @@ pkgs=(
   pkg-config
   tig
 )
-apt-get install --yes "${pkgs[@]}"
+apt-install-all "${pkfs[@]}"
