@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Usage: ./bin/del-pair-user <ip-address> <user-id> [-R | <deluser options>]
+
+set -ex
+
+ip_address="${1:?ip-address required}"
+pair_user="${2:?userid required}"
+shift; shift
+options=()
+for arg; do
+  case "$arg" in
+  -R) options+=(--remove-home);;
+  *)  options+=("$arg");;
+  esac
+done
+root_user=root
+file_name="${0##*/}"
+
+# Copy over pair's key if present:
+pair_key="user/$pair_user/id_rsa.pub"
+if [ -e "$pair_key" ]; then
+  scp "$pair_key" "$root_user@$ip_address:${pair_user}_key"
+fi
+
+cat <<... | ssh $root_user@$ip_address "cat > $file_name"
+#!/bin/bash
+
+set -ex
+
+deluser $pair_user ${options[@]}
+...
+
+ssh -t $root_user@$ip_address bash $file_name
