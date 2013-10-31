@@ -1,14 +1,19 @@
+== Refactor
 - Get public-key from git-hub
+- Build root/admin scripts in Build
+- Put welcome into motd file
+- Make the add/del-user scripts be server side
+
+== Tmux
+- display welcome screen
+
+== Post-build
 - build perls
 - preconfig git-hub
 - {pre,post}-github-repos
   - or just do all in post-setup
 
-
 == Current Projects
-- git-hub Makefile
-  - automatic submodule stuff
-  - DESTDIR
 - git hub commands # list commands
 - git hub travis plugin
 - git hub bpan
