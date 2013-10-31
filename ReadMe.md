@@ -1,6 +1,6 @@
 ## Name
 
-Pairup! -- Fast, Custom, Throwaway Pair Programming VPS
+Pairup -- Fast, Custom, Throwaway Pair Programming VPS
 
 ## Synopsis
 
