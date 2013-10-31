@@ -1,17 +1,15 @@
 #!/bin/bash
 
+# These packages are almost always needed for a PairUp:
 pkgs=(
   ack-grep
   build-essential
-  cpanminus
-  exuberant-ctags
-  libjson-perl
-  libjson-xs-perl
   tmux
   tree
   vim-nox
+  weechat
 )
 apt-get install --yes "${pkgs[@]}"
 
 # Symlink ack to ack-grep
-ln -s /usr/bin/ack-grep /usr/local/bin/ack
+ln -fs /usr/bin/ack-grep /usr/local/bin/ack

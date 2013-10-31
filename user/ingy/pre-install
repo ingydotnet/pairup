@@ -1,7 +1,11 @@
 pkgs=(
   autoreconf
-  libtool
+  cpanminus
+  exuberant-ctags
+  libjson-perl
+  libjson-xs-perl
   libssl-dev
+  libtool
   pkg-config
   tig
 )

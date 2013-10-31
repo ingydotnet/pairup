@@ -1,9 +1,10 @@
 - build perls
 - preconfig git-hub
+- {pre,post}-github-repos
+  - or just do all in post-setup
 
 
 == Current Projects
-- YAML::Tiny
 - git-hub Makefile
   - automatic submodule stuff
   - DESTDIR

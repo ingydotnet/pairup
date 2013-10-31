@@ -12,138 +12,198 @@ USAGE="Usage: ${0##*/} <ip-address> <pair-user-id> [<admin-user-id>]"
 
 die() { echo "$@" >&2; exit 1; }
 
-if [ $# -lt 2 -o $# -gt 3 ] ||
-   [[ ! "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    die "$USAGE"
-fi
+main() {
+  local root_user=root
+  local provider= ip_address= admin_user= pair_user= setup_file_name=
 
-ip_address="$1"
-pair_user="$2"
-admin_user="${3:-$USER}"
-setup_file_name='~/pairup-setup.bash'
+  set -x
+  get-opts "$@"
+  setup
+  set +x
+  build-config
+  set -x
 
-# cd to the pairup repo:
-pairup_bin="$0"
-[[ "$pairup_bin" =~ ^bin/[A-Za-z0-9_-]+$ ]] &&
-  pairup_bin="./$pairup_bin"
-[[ "$pairup_bin" =~ .+/bin/[A-Za-z0-9_-]+$ ]] ||
-  die "Invalid invocation path: '$pairup_bin'"
-cd ${pairup_bin%/bin/*} ||
-  die "Can't cd to pairup repo"
+  root-setup
+  # Copy build dir over to root:
+  scp -r build $root_user@$ip_address:
+  # Run the interactive root script:
+  ssh -t $root_user@$ip_address bash $setup_file_name
 
-# Get the repo name to use:
-pairup_repo="$(git remote -v | grep -E '^origin' | head -n1 | cut -f2 | cut -d ' ' -f1)"
-[ -n "$pairup_repo" ] ||
-  die "Can't find remote"
-[[ "$pairup_repo" =~ github\.com ]] ||
-  die "'$pairup_repo' is bad repo name"
+  admin-setup
+  # Run the interactive admin_user script:
+  ssh -t $admin_user@$ip_address bash $setup_file_name
+
+  # Now you should be inside a perfectly working tmux session for pairing.
+  # Run the `PairUp` command and it will tell you what your partner needs.
+}
+
+get-opts() {
+  local args=()
+
+  for arg; do
+    case "$arg" in
+    --hp) provider=hpcloud ;;
+    --rs) provider=rackspace ;;
+    -N)   PAIRUP_NO_SUDO_PASSWORD=1 ;;
+    *)    args+=("$arg") ;;
+    esac
+  done
+
+  set -- "${args[@]}"
+
+  if [ $# -lt 2 -o $# -gt 3 ] ||
+    [[ ! "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+      die "$USAGE"
+  fi
+
+  ip_address="$1"
+  pair_user="$2"
+  admin_user="${3:-$USER}"
+  setup_file_name='~/pairup-setup.bash'
+
+  [ "$provider" == 'hpcloud' ] &&
+    root_user=ubuntu
+  :
+}
+
+setup() {
+  # cd to the pairup repo:
+  pairup_bin="$0"
+  [[ "$pairup_bin" =~ ^bin/[A-Za-z0-9_-]+$ ]] &&
+    pairup_bin="./$pairup_bin"
+  [[ "$pairup_bin" =~ .+/bin/[A-Za-z0-9_-]+$ ]] ||
+    die "Invalid invocation path: '$pairup_bin'"
+  cd ${pairup_bin%/bin/*} ||
+    die "Can't cd to pairup repo"
+
+  # Get the repo name to use:
+  pairup_repo="$(
+    git remote -v |
+    grep -E '^origin' |
+    head -n1 |
+    cut -f2 |
+    cut -d ' ' -f1
+  )"
+  [ -n "$pairup_repo" ] ||
+    die "Can't find remote"
+  [[ "$pairup_repo" =~ github\.com ]] ||
+    die "'$pairup_repo' is bad repo name"
+  :
+}
 
 #------------------------------------------------------------------------------
 # Create local config build:
 #------------------------------------------------------------------------------
+build-config() {
+  # Copy over default and user files:
+  rm -fr build
+  cp -r conf build
 
-# Copy over default and user files:
-rm -fr build
-cp -r conf build
-
-for user in "$admin_user" "$pair_user" private; do
-  for file in conf... github-repos known_hosts pre-install post-install ssh-config; do
-    if [ -e "user/$user/$file" ]; then
-      cat "user/$user/$file" >> "build/$file"
-    fi
+  for user in "$admin_user" "$pair_user" private; do
+    for file in conf... github-repos known_hosts pre-install post-install ssh-config; do
+      if [ -e "user/$user/$file" ]; then
+        cat "user/$user/$file" >> "build/$file"
+      fi
+    done
   done
-done
-
-set -x
+}
 
 #------------------------------------------------------------------------------
 # Do the 'root' stuff first:
 #------------------------------------------------------------------------------
+root-setup() {
+  # Set up ssh key for root. Needs root password:
+  admin_key=user/$admin_user/id_rsa.pub
+  if [ ! -e "$admin_key" ]; then
+    admin_key=~/.ssh/id_rsa.pub
+  fi
+  if [ -e "$admin_key" -a "$root_user" == root ]; then
+    cat "$admin_key" | ssh "$root_user@$ip_address" \
+      "cat > k; mkdir -p .ssh; chmod 700 .ssh; mv k .ssh/authorized_keys"
+  fi
 
-# Set up ssh key for root. Needs root password:
-admin_key=user/$admin_user/id_rsa.pub
-if [ ! -e "$admin_key" ]; then
-  admin_key=~/.ssh/id_rsa.pub
-fi
-if [ -e "$admin_key" ]; then
-  cat $admin_key | ssh root@$ip_address \
-    "cat > k; mkdir -p .ssh; chmod 700 .ssh; mv k .ssh/authorized_keys"
-fi
+  # Copy over known hosts:
+  scp build/known_hosts $root_user@$ip_address:.ssh/known_hosts
 
-# Copy over known hosts:
-scp build/known_hosts root@$ip_address:.ssh/known_hosts
+  # Copy over pair's key if present:
+  pair_key=user/$pair_user/id_rsa.pub
+  if [ -e $pair_key ]; then
+    scp $pair_key $root_user@$ip_address:pair_key
+  fi
 
-# Copy over pair's key if present:
-pair_key=user/$pair_user/id_rsa.pub
-if [ -e $pair_key ]; then
-  scp $pair_key root@$ip_address:pair_key
-fi
-
-# Copy this setup script to root's $HOME:
-cat <<... | ssh root@$ip_address "cat > $setup_file_name"
+  # Copy this setup script to root's $HOME:
+  cat <<... | ssh $root_user@$ip_address "cat > $setup_file_name"
 set -ex
 
 # Remove this script:
 rm $setup_file_name
 
 # Add users. sudo for $admin_user:
-addgroup admin
-adduser $admin_user
-adduser $admin_user admin
+{
+  addgroup admin
+  adduser $admin_user
+  adduser $admin_user admin
+}
 
 # Move the public key over to $admin_user's home:
-mkdir -p /home/$admin_user/.ssh
-chmod 700 /home/$admin_user/.ssh
-cp ~/.ssh/authorized_keys /home/$admin_user/.ssh/
-chown -R $admin_user:$admin_user /home/$admin_user/.ssh
+{
+  mkdir -p /home/$admin_user/.ssh
+  chmod 700 /home/$admin_user/.ssh
+  cp ~/.ssh/authorized_keys /home/$admin_user/.ssh/
+  chown -R $admin_user:$admin_user /home/$admin_user/.ssh
 
-if [ -f pair_key ]; then
-  adduser --disabled-password $pair_user
-  mkdir -p /home/$pair_user/.ssh
-  chmod 700 /home/$pair_user/.ssh
-  mv pair_key /home/$pair_user/.ssh/authorized_keys
-  chown -R $pair_user:$pair_user /home/$pair_user/.ssh
-else
-  adduser $pair_user
-fi
+  if [ -n "$PAIRUP_NO_SUDO_PASSWORD" ]; then
+    echo "ALL ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+  fi
+}
+
+# Add pair user:
+{
+  if [ -f pair_key ]; then
+    adduser --disabled-password $pair_user
+    mkdir -p /home/$pair_user/.ssh
+    chmod 700 /home/$pair_user/.ssh
+    mv pair_key /home/$pair_user/.ssh/authorized_keys
+    chown -R $pair_user:$pair_user /home/$pair_user/.ssh
+  else
+    adduser $pair_user
+  fi
+}
 
 # Get git:
-apt-get update --yes
-apt-get install git --yes
+{
+  apt-get update --yes
+  apt-get install git --yes
 
-# Clone this repo, and put the tools in the PATH:
-git clone $pairup_repo pairup
-cp -p pairup/bin/* /usr/local/bin/
+  # Clone this repo, and put the tools in the PATH:
+  git clone $pairup_repo pairup
+  cp -p pairup/bin/* /usr/local/bin/
 
-# Install requested software:
-bash build/pre-install
-
-if [ -n "$PAIRUP_NO_SUDO_PASSWORD" ]; then
-  echo "ALL ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-fi
+  # Install requested software:
+  bash build/pre-install
+}
 
 # TODO scramble root password
 ...
-
-# Copy build dir over to root:
-scp -r build root@$ip_address:
-
-# Run the interactive root script:
-ssh -t root@$ip_address bash $setup_file_name
+}
 
 #------------------------------------------------------------------------------
 # Now do the 'admin_user' stuff:
 #------------------------------------------------------------------------------
 
-# Copy over known_hosts and config to .ssh/:
-scp build/known_hosts $admin_user@$ip_address:.ssh/known_hosts
-scp build/ssh-config $admin_user@$ip_address:.ssh/config
+admin-setup() {
+  # Copy admin files to server:
+  {
+    # Copy over known_hosts and config to .ssh/:
+    scp build/known_hosts $admin_user@$ip_address:.ssh/known_hosts
+    scp build/ssh-config $admin_user@$ip_address:.ssh/config
 
-# Copy build dir over to $admin_user:
-scp -r build $admin_user@$ip_address:
+    # Copy build dir over to $admin_user:
+    scp -r build $admin_user@$ip_address:
+  }
 
-# Copy this setup script to $admin_user's $HOME.
-cat <<... | ssh $admin_user@$ip_address "cat > $setup_file_name"
+  # Copy this setup script to $admin_user's $HOME.
+  cat <<... | ssh $admin_user@$ip_address "cat > $setup_file_name"
 set -ex
 
 # Remove this script:
@@ -177,10 +237,9 @@ set +x
 cat <<.....
 Welcome to your new PairUp VPS tmux session!
 
-Tell $pair_user to run these commands:
+Tell $pair_user to run this command:
 
-    ssh $pair_user@$ip_address
-    pairup
+    ssh -t $pair_user@$ip_address pairup
 
 .....
 ....
@@ -194,9 +253,6 @@ tmux -S /tmp/pairup
 - post-install
 - Split screen, irssi
 ...
+}
 
-# Run the interactive admin_user script:
-ssh -t $admin_user@$ip_address bash $setup_file_name
-
-# Now you should be inside a perfectly working tmux session for pairing.
-# Run the `PairUp` command and it will tell you what your partner needs.
+main "$@"
