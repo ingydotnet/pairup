@@ -57,7 +57,7 @@ get-opts() {
   ip_address="$1"
   pair_user="$2"
   admin_user="${3:-$USER}"
-  setup_file_name='~/pairup-setup.bash'
+  setup_file_name="${0##*/}.bash"
 
   [ "$provider" == 'hpcloud' ] &&
     root_user=ubuntu
