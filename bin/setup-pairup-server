@@ -245,6 +245,7 @@ git clone $pairup_repo pairup || continue?
 # Get other repos of interest
 while read repo; do
   [ -z "\$repo" ] && continue
+  [[ "\$repo" =~ ^\# ]] && continue
   git clone git@github.com:\$repo src/\${repo#*/} || continue?
   :
 done < Build/github-repos
