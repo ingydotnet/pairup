@@ -141,7 +141,7 @@ rm $setup_file_name
 # Add users. sudo for $admin_user:
 {
   addgroup admin
-  adduser $admin_user
+  adduser --gecos '' $admin_user
   adduser $admin_user admin
 }
 
@@ -160,13 +160,13 @@ rm $setup_file_name
 # Add pair user:
 {
   if [ -f pair_key ]; then
-    adduser --disabled-password $pair_user
+    adduser --disabled-password --gecos '' $pair_user
     mkdir -p /home/$pair_user/.ssh
     chmod 700 /home/$pair_user/.ssh
     mv pair_key /home/$pair_user/.ssh/authorized_keys
     chown -R $pair_user:$pair_user /home/$pair_user/.ssh
   else
-    adduser $pair_user
+    adduser --gecos '' $pair_user
   fi
 }
 
