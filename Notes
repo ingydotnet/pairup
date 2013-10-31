@@ -6,6 +6,7 @@
 
 == Tmux
 - display welcome screen
+- switch to ctl-a
 
 == Post-build
 - build perls
