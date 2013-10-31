@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Usage: ./bin/add-pair-user <ip-address> <user-id>
+
+set -ex
+
+ip_address="${1:?ip-address required}"
+pair_user="${2:?userid required}"
+root_user=root
+file_name="${0##*/}"
+
+# Copy over pair's key if present:
+pair_key="user/$pair_user/id_rsa.pub"
+if [ -e "$pair_key" ]; then
+  scp "$pair_key" "$root_user@$ip_address:${pair_user}_key"
+fi
+
+cat <<... | ssh $root_user@$ip_address "cat > $file_name"
+#!/bin/bash
+
+if [ -f ${pair_user}_key ]; then
+  adduser --disabled-password --gecos '' $pair_user
+  mkdir -p /home/$pair_user/.ssh
+  chmod 700 /home/$pair_user/.ssh
+  mv ${pair_user}_key /home/$pair_user/.ssh/authorized_keys
+  chown -R $pair_user:$pair_user /home/$pair_user/.ssh
+else
+  adduser --gecos '' $pair_user
+fi
+...
+
+ssh -t $root_user@$ip_address bash $file_name

@@ -1,12 +1,5 @@
 #!/bin/bash
 
-apt-install-all() {
-  apt-get install --yes "${pkgs[@]}" || {
-    echo -c "Error. ctl-c to exit. Enter to continue."; read
-  }
-  :
-}
-
 # These packages are almost always needed for a PairUp:
 pkgs=(
   ack-grep
@@ -16,7 +9,7 @@ pkgs=(
   vim-nox
   weechat
 )
-apt-install-all "${pkfs[@]}"
+apt-get-install "${pkgs[@]}"
 
 # Symlink ack to ack-grep
 ln -fs /usr/bin/ack-grep /usr/local/bin/ack

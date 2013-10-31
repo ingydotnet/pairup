@@ -24,7 +24,7 @@ main() {
   set -x
 
   root-setup
-  # Copy build dir over to root:
+  # Copy Build dir over to root:
   scp -r Build $root_user@$ip_address:
   # Run the interactive root script:
   ssh -t $root_user@$ip_address bash $setup_file_name
@@ -34,7 +34,7 @@ main() {
   ssh -t $admin_user@$ip_address bash $setup_file_name
 
   # Now you should be inside a perfectly working tmux session for pairing.
-  # Run the `PairUp` command and it will tell you what your partner needs.
+  # Run the `PairInfo` command and it will tell you what your partner needs.
 }
 
 get-opts() {
@@ -123,16 +123,20 @@ root-setup() {
   fi
 
   # Copy over known hosts:
-  scp Build/known_hosts $root_user@$ip_address:.ssh/known_hosts
+  scp Build/known_hosts "$root_user@$ip_address:.ssh/known_hosts"
 
   # Copy over pair's key if present:
-  pair_key=user/$pair_user/id_rsa.pub
-  if [ -e $pair_key ]; then
-    scp $pair_key $root_user@$ip_address:pair_key
+  pair_key="user/$pair_user/id_rsa.pub"
+  if [ -e "$pair_key" ]; then
+    scp "$pair_key" "$root_user@$ip_address:${pair_user}_key"
   fi
 
   # Copy this setup script to root's $HOME:
   cat <<... | ssh $root_user@$ip_address "cat > $setup_file_name"
+#!/bin/bash
+
+continue?() { echo -c "Error. ctl-c to exit. Enter to continue."; read; }
+
 set -ex
 
 # Remove this script:
@@ -140,9 +144,9 @@ rm $setup_file_name
 
 # Add users. sudo for $admin_user:
 {
-  addgroup admin
-  adduser --gecos '' $admin_user
-  adduser $admin_user admin
+  addgroup admin || continue?
+  adduser --gecos '' $admin_user || continue?
+  adduser $admin_user admin || continue?
 }
 
 # Move the public key over to $admin_user's home:
@@ -159,31 +163,38 @@ rm $setup_file_name
 
 # Add pair user:
 {
-  if [ -f pair_key ]; then
-    adduser --disabled-password --gecos '' $pair_user
+  if [ -f ${pair_user}_key ]; then
+    adduser --disabled-password --gecos '' $pair_user || continue?
     mkdir -p /home/$pair_user/.ssh
     chmod 700 /home/$pair_user/.ssh
-    mv pair_key /home/$pair_user/.ssh/authorized_keys
+    mv ${pair_user}_key /home/$pair_user/.ssh/authorized_keys
     chown -R $pair_user:$pair_user /home/$pair_user/.ssh
   else
-    adduser --gecos '' $pair_user
+    adduser --gecos '' $pair_user || continue?
   fi
 }
 
 # Get git:
 {
   apt-get update --yes
-  apt-get install git --yes
+  apt-get install git --yes || continue?
 
   # Clone this repo, and put the tools in the PATH:
-  git clone $pairup_repo pairup
+  git clone $pairup_repo pairup || continue?
 
   # Make a command called 'pairup' to (re)join tmux:
-  echo 'tmux -S /tmp/pairup attach || tmux -S /tmp/pairup' > /usr/local/bin/pairup
-  chmod +x /usr/local/bin/pairup
+  echo 'tmux -S /tmp/pairup attach || tmux -S /tmp/pairup' > /usr/local/bin/PairUp
+  chmod +x /usr/local/bin/PairUp
+
+  # apt-get install requested packages:
+  apt-get-install() {
+    for pkg; do
+      apt-get install --yes "$pkg" || continue?
+    done
+  }
 
   # Install requested software:
-  bash Build/pre-install
+  source Build/pre-install
 }
 
 # TODO scramble root password
@@ -228,25 +239,26 @@ mv Build/conf... .../conf
 .../... update
 .../... install
 
-# Make a little remote script called 'PairUp'. Run this first thing to get
+# Make a little remote script called 'PairInfo'. Run this first thing to get
 # your bearings inside the VPS:
-cat <<.... > ~/bin/PairUp
+cat <<.... > ~/bin/PairInfo
 chmod 777 /tmp/pairup
 
-set -x
-sudo bash Build/post-install &> /tmp/pairup-post-install.log &
-set +x
+# set -x
+# sudo bash Build/post-install &> /tmp/pairup-post-install.log &
+# set +x
 
 cat <<.....
+
 Welcome to your new PairUp VPS tmux session!
 
 Tell $pair_user to run this command:
 
-    ssh -t $pair_user@$ip_address pairup
+    ssh -t $pair_user@$ip_address PairUp
 
 .....
 ....
-chmod +x ~/bin/PairUp
+chmod +x ~/bin/PairInfo
 
 # Start tmux with a shared socket:
 tmux -S /tmp/pairup
