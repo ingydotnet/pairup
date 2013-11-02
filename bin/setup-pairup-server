@@ -13,19 +13,20 @@ USAGE="Usage: ${0##*/} <ip-address> <pair-user-id> [<admin-user-id>]"
 die() { echo "$@" >&2; exit 1; }
 
 main() {
-  local root_user=root
-  local provider= ip_address= admin_user= pair_user= setup_file_name=
+  local root_user=root sudo=
+  local ip_address= admin_user= pair_user= setup_file_name=
 
   set -x
   get-opts "$@"
   setup
   set +x
   build-config
+  [ -n "$PAIRUP_BUILD_ONLY" ] && exit
   set -x
 
   root-setup
   # Run the interactive root script:
-  ssh -t $root_user@$ip_address bash $setup_file_name
+  ssh -t $root_user@$ip_address $sudo bash $setup_file_name
 
   admin-setup
   # Run the interactive admin_user script:
@@ -40,9 +41,15 @@ get-opts() {
 
   for arg; do
     case "$arg" in
-    --hp) provider=hpcloud ;;
-    --rs) provider=rackspace ;;
-    -N)   PAIRUP_NO_SUDO_PASSWORD=1 ;;
+    --hp)
+      sudo=sudo
+      root_user=ubuntu
+      ;;
+    -N)
+      PAIRUP_NO_SUDO_PASSWORD=1
+      ;;
+    -B)
+      PAIRUP_BUILD_ONLY=1
     *)    args+=("$arg") ;;
     esac
   done
@@ -58,10 +65,6 @@ get-opts() {
   pair_user="$2"
   admin_user="${3:-$USER}"
   setup_file_name="${0##*/}.bash"
-
-  [ "$provider" == 'hpcloud' ] &&
-    root_user=ubuntu
-  :
 }
 
 setup() {
