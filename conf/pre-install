@@ -4,6 +4,9 @@
 pkgs=(
   ack-grep
   build-essential
+  cpanminus
+  exuberant-ctags
+  tig
   tmux
   tree
   vim-nox
