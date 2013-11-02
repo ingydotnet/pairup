@@ -1,0 +1,4 @@
+pkgs=(
+  htop
+)
+apt-get-install "${pkgs[@]}"
