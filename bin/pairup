@@ -1,0 +1,25 @@
+#!/bin/bash
+
+tmux_sock=/tmp/pairup
+log_file=/tmp/PairUp/install.log
+
+set -x
+tmux -S $tmux_sock attach || tmux -S $tmux_sock new \
+\
+';' set-window-option -g automatic-rename off \
+\
+';' new-window -t :2 -n "tail -f $log_file" \
+';' send-keys "chmod 777 $tmux_sock" C-m \
+';' send-keys "tail -f $log_file" C-m \
+\
+';' select-window -t :1 \
+';' rename-window "ingy + xdg = PairUp!" \
+';' split-window -h -p 33 \
+';' send-keys "weechat-curses" C-m \
+';' select-pane -L \
+
+exit
+
+# See:
+# - http://www.tofu.org/drupal/node/183
+# - http://robots.thoughtbot.com/a-tmux-crash-course
