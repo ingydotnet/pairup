@@ -1,0 +1,8 @@
+# CPAN modules to install:
+
+Devel::Local
+IO::All
+JSON
+JSON::XS
+XXX
+YAML::XS

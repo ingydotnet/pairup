@@ -1,2 +1,4 @@
+# SSH configuration:
+
 Host *
     ForwardAgent yes

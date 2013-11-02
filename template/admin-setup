@@ -1,0 +1,45 @@
+#!/bin/bash
+
+set -e
+
+PairUp=/tmp/PairUp
+
+source helper-pairup-functions
+
+main() {
+  set -x
+  SECTION "Admin user setup:"
+
+  SECTION "Copy known_hosts and config to .ssh/:"
+  cp $PairUp/known_hosts .ssh/known_hosts
+  cp $PairUp/ssh-config .ssh/config
+
+  SECTION "Install ... dotfile management setup:"
+  git clone git@github.com:sharpsaw/....git || continue?
+  mv $PairUp/conf... .../conf
+  .../... update || continue?
+  .../... install || continue?
+
+  SECTION "sudo install-pairup-software"
+  (
+    log="$PairUp/install.log"
+    $section_command &>> $log || carp &>> $log &
+  ) &
+
+  SECTION "sudo install-pairup-cpan"
+  (
+    log="$PairUp/cpan.log"
+    $section_command &>> $log || carp &>> $log &
+  ) &
+
+  SECTION "install-pairup-repos"
+  (
+    log="$PairUp/github.log"
+    $section_command &>> $log || carp &>> $log &
+  ) &
+
+  SECTION "Start the PairUp custom tmux setup:"
+  bash -l "$PairUp/bin/pairup" || true
+}
+
+[ "$0" == "${BASH_SOURCE[0]}" ] && main "$@";:

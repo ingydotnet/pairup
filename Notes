@@ -1,21 +1,20 @@
-== Refactor
-- Get public-key from git-hub
-- Build root/admin scripts in Build
-- Put welcome into motd file
-- Make the add/del-user scripts be server side
-
-== Tmux
-- display welcome screen
-- switch to ctl-a
+== Conf
 
 == Post-build
 - build perls
-- preconfig git-hub
-- {pre,post}-github-repos
-  - or just do all in post-setup
 
-== Current Projects
-- git hub commands # list commands
-- git hub travis plugin
-- git hub bpan
-- rackspace-api-bash
+== Refactor
+- Make the add/del-user scripts be server side
+
+== Servers
+- Get working on HPCloud
+- Get working on other Linux distros
+
+== Test
+- Test the --NP flag
+
+== Tmux
+
+== WeeChat
+- Config weechat
+  - irc-dots

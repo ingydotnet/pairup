@@ -1,0 +1,8 @@
+
+Welcome to your new PairUp Server tmux session!
+
+Tell %%pair_user%% to run this command:
+
+    ssh -t %%pair_user%%@%%ip_address%% pairup
+
+-------------------------------------------------------------------------------

@@ -2,6 +2,10 @@
 
 # Delete a new rackspace server instance
 
+set -ex
+
+source "${BASH_SOURCE%/*}/helper-pairup-functions"
+
 echo "$0 not implemented yet" >&2
 
 exit 1

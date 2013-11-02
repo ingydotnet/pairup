@@ -1,12 +1,19 @@
 ingydotnet/bpan-bash
+ingydotnet/dist-zilla-plugin-changesfromyaml
+ingydotnet/dist-zilla-pluginbundle-ingy-pm
 ingydotnet/io-all-pm
 ingydotnet/language-snusp-pm
 ingydotnet/lola
-# ingydotnet/rosettacode-pm
+ingydotnet/mo-pm
+ingydotnet/pegex-pm
+ingydotnet/rosettacode-pm
 ingydotnet/testml-pm
+ingydotnet/testml-tiny-pm
 ingydotnet/test-more-bash
 ingydotnet/test-more-rb
 ingydotnet/yaml-pm
+ingydotnet/yaml-old-pm
+ingydotnet/yaml-libyaml-pm
 ingydotnet/yaml-spec-tml
 
 Perl-Toolchain-Gang/YAML-Tiny

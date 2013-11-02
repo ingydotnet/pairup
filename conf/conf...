@@ -1,8 +1,14 @@
+# ... (dot files) configuration file:
 install_method: symlink
 dots:
-- repo: git@github.com:sharpsaw/loop-dots.git
-- repo: git@github.com:sharpsaw/git-dots.git
-- repo: git@github.com:ingydotnet/misc-dots.git
-- repo: git@github.com:sharpsaw/sane-dots.git
-- repo: git@github.com:sharpsaw/tmux-dots.git
-- repo: git@github.com:sharpsaw/vim-dots.git
+- repo: git@github.com:PairUp/loop-dots.git
+- repo: git@github.com:PairUp/sane-dots.git
+- repo: git@github.com:PairUp/git-dots.git
+- repo: git@github.com:PairUp/misc-dots.git
+- repo: git@github.com:PairUp/pairup-dots.git
+- repo: git@github.com:PairUp/vim-dots.git
+# This one is broken currently
+# - repo: git@github.com:PairUp/unicode-dots.git
+- repo: git@github.com:PairUp/tmux-dots.git
+# This one is rkings personal. too many chans
+# - repo: git@github.com:PairUp/irc-dots.git

@@ -1,0 +1,10 @@
+# Basic essential debian pkgs:
+exuberant-ctags
+htop
+libncurses-dev
+libtool
+pkg-config
+tig
+tmux
+tree
+vim

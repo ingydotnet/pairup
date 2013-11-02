@@ -1,34 +1,29 @@
 #!/bin/bash
 
-# Usage: ./bin/del-pair-user <ip-address> <user-id> [-R | <deluser options>]
+# Usage: del-pair-user <user-id> [-R | <deluser options>]
 
-set -ex
+set -e
 
-ip_address="${1:?ip-address required}"
-pair_user="${2:?userid required}"
-shift; shift
-options=()
-for arg; do
-  case "$arg" in
-  -R) options+=(--remove-home);;
-  *)  options+=("$arg");;
-  esac
-done
-root_user=root
-file_name="${0##*/}"
+source "${BASH_SOURCE%/*}/helper-pairup-functions"
 
-# Copy over pair's key if present:
-pair_key="user/$pair_user/id_rsa.pub"
-if [ -e "$pair_key" ]; then
-  scp "$pair_key" "$root_user@$ip_address:${pair_user}_key"
-fi
+main() {
+  set -x
 
-cat <<... | ssh $root_user@$ip_address "cat > $file_name"
-#!/bin/bash
+  pair_user="${1:?userid required}"; shift
 
-set -ex
+  options=()
+  for arg; do
+    case "$arg" in
+    -R)
+      options+=('--remove-home')
+      ;;
+    *)
+      options+=("$arg")
+      ;;
+    esac
+  done
 
-deluser $pair_user ${options[@]}
-...
+  deluser "$pair_user" ${options[*]}
+}
 
-ssh -t $root_user@$ip_address bash $file_name
+[ "$0" == "${BASH_SOURCE[0]}" ] && main "$@";:

@@ -7,10 +7,12 @@ same)).
 Typical contents are:
 
 * `id_rsa.pub`          - Your public ssh key for joining the PairUp VPS
-* `meta`                - Any contact info you want to share
+                        - Typically this can be retrieved from GitHub
 * `conf...              - Your `...` conf. See http://github.com/sharpsaw/.../
-* `pre-install`         - Bash script to apt-get install, etc.
-* `post-install`        - Bash script run after initial setup.
+* `cpan`                - List of CPAN modules to cpanm install
+* `debian`              - List of debian pkgs to apt-get install
+* `install`             - Bash script to do any custom installation
+* `github`              - List of GitHub repos to clone
 * `known_hosts`         - Preset ssh knownhosts, to avoid prompting
 
 Most of those files are snippets that are concatenated with your pair

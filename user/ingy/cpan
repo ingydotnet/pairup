@@ -1,0 +1,10 @@
+Dist::Zilla::PluginBundle::INGY
+Dist::Zilla::Plugin::VersionFromModule
+
+Vroom
+
+YAML
+YAML::Shell
+YAML::Syck
+YAML::Tiny
+YAML::XS

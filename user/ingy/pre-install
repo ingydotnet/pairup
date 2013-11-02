@@ -1,8 +1,0 @@
-pkgs=(
-  libjson-perl
-  libjson-xs-perl
-  libssl-dev
-  libtool
-  pkg-config
-)
-apt-get-install "${pkgs[@]}"

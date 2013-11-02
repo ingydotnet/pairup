@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Install ack-grep and symlink as ack:
+apt-get install ack-grep --yes
+ln -fs /usr/bin/ack-grep /usr/local/bin/ack
+
+git clone git@github.com:ingydotnet/git-hub ||
+  carp 'git clone git@github.com:ingydotnet/git-hub'
+
+(cd git-hub; git submodule update --init; make install) || true
+
+apt-get install perl-doc ||
+  carp 'apt-get install perl-doc'
+
+:
