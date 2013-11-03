@@ -21,6 +21,7 @@ main() {
   mkdir -p /home/$pair_user/.ssh
   chmod 700 /home/$pair_user/.ssh
   cp $PairUp/user/$pair_user/id_rsa.pub /home/$pair_user/.ssh/authorized_keys
+  chown -R "$pair_user"."$pair_user" /home/$pair_user/.ssh
 }
 
 [ "$0" == "${BASH_SOURCE[0]}" ] && main "$@";:

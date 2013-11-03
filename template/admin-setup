@@ -10,6 +10,17 @@ main() {
   set -x
   SECTION "Admin user setup:"
 
+  SECTION "Make a pairup-env to preserve the state:"
+  mkdir -p ~/.sh
+  cat <<... > ~/.sh/pairup-env
+export PAIRUP=true
+export PAIRUP_ADMIN=%%admin_user%%
+export PAIRUP_PAIR=%%pair_user%%
+export PAIRUP_IPADDR=%%ip_address%%
+export PAIRUP_STARTED="%%time_of_day%%"
+export PAIRUP_REPO=%%pairup_repo%%
+...
+
   SECTION "Copy known_hosts and config to .ssh/:"
   cp $PairUp/known_hosts .ssh/known_hosts
   cp $PairUp/ssh-config .ssh/config

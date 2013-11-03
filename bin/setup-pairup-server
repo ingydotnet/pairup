@@ -168,6 +168,7 @@ build-config() {
     text=${text//%%pair_user%%/$pair_user}
     text=${text//%%pairup_repo%%/$pairup_repo}
     text=${text//%%ip_address%%/$ip_address}
+    text=${text//%%time_of_day%%/$(date)}
     echo "$text" > "$PairUp/${t##*/}"
   done
 }
