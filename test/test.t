@@ -24,16 +24,16 @@ while read -r bash; do
     fi
   fi
 done <<...
-bin/add-pairup-user
-bin/del-pairup-user
-bin/install-pairup-repos
-bin/helper-pairup-functions
-bin/install-pairup-cpan
-bin/install-pairup-software
-bin/invite-pairup-user
 bin/pairup
+bin/pairup-add-user
+bin/pairup-del-user
+bin/pairup-helper-functions
 bin/pairup-info
-bin/setup-pairup-server
+bin/pairup-install-cpan
+bin/pairup-install-repos
+bin/pairup-install-software
+bin/pairup-invite-user
+bin/pairup-setup-server
 template/admin-setup
 template/root-setup
 ...

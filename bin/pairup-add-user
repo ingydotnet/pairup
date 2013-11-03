@@ -4,8 +4,8 @@
 
 set -e
 
-source "${BASH_SOURCE%/*}/helper-pairup-functions"
-source $PairUp/bin/setup-pairup-server
+source "${BASH_SOURCE%/*}/pairup-helper-functions"
+source $PairUp/bin/pairup-setup-server
 
 main() {
   set -x

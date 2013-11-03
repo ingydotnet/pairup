@@ -11,7 +11,7 @@ set -e
 export PairUp=/tmp/PairUp
 
 PATH="$PairUp/bin:$PATH" \
-  source helper-pairup-functions
+  source pairup-helper-functions
 
 main() {
   set -x

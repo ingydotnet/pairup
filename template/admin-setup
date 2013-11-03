@@ -4,7 +4,7 @@ set -e
 
 PairUp=/tmp/PairUp
 
-source helper-pairup-functions
+source pairup-helper-functions
 
 main() {
   set -x
@@ -31,19 +31,19 @@ export PAIRUP_REPO=%%pairup_repo%%
   .../... update || continue?
   .../... install || continue?
 
-  SECTION "sudo install-pairup-software"
+  SECTION "sudo pairup-install-software"
   (
     log="$PairUp/install.log"
     $section_command &>> $log || carp &>> $log &
   ) &
 
-  SECTION "sudo install-pairup-cpan"
+  SECTION "sudo pairup-install-cpan"
   (
     log="$PairUp/cpan.log"
     $section_command &>> $log || carp &>> $log &
   ) &
 
-  SECTION "install-pairup-repos"
+  SECTION "pairup-install-repos"
   (
     log="$PairUp/github.log"
     $section_command &>> $log || carp &>> $log &

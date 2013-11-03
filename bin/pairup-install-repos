@@ -2,7 +2,7 @@
 
 set -e
 
-source "${BASH_SOURCE%/*}/helper-pairup-functions"
+source "${BASH_SOURCE%/*}/pairup-helper-functions"
 
 main() {
   set -x

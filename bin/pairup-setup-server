@@ -10,7 +10,7 @@ set -e
 
 USAGE="Usage: ${0##*/} <ip-address> <pair-user-id> [<admin-user-id>]"
 
-source "${BASH_SOURCE%/*}/helper-pairup-functions"
+source "${BASH_SOURCE%/*}/pairup-helper-functions"
 
 # main() is called at bottom of this file:
 main() {

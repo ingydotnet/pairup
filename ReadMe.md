@@ -9,7 +9,7 @@ ip_address and root password.
 
 Then run:
 
-    ./bin/setup-pairup-server <ip-address> [<pair-user-id> [<admin-user-id>]]
+    ./bin/pairup-setup-server <ip-address> [<pair-user-id> [<admin-user-id>]]
 
 Soon you will find your self in a remote tmux wonderland, customized exactly
 the way that you your pair like it.
@@ -29,7 +29,7 @@ your settings and software and repos etc, ready to go.
 
 The PairUp project is about making this easy. You just need an account on a
 cloud IaaS provider like RackSpace or HPCloud or AWS, where you pay by the
-minute (~ 5 cents/hour), and then you run `setup-pairup-server` and in a few
+minute (~ 5 cents/hour), and then you run `pairup-setup-server` and in a few
 minutes you are logged in. PairUp displays info to tell your pair friend, so
 they can join you.
 

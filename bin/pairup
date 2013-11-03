@@ -6,7 +6,7 @@
 
 # set -x
 
-source "${BASH_SOURCE%/*}/helper-pairup-functions"
+source "${BASH_SOURCE%/*}/pairup-helper-functions"
 
 main() {
   check_cmd "$@"
@@ -44,7 +44,7 @@ check_cmd() {
     cat <<... >&2
 You ran 'pairup' with arguments. Maybe you meant:
 
-    ${0%/*}/setup-pairup-server $@
+    ${0%/*}/pairup-setup-server $@
 
 ...
     exit 1

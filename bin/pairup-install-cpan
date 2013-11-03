@@ -2,7 +2,7 @@
 
 set -e
 
-source "${BASH_SOURCE%/*}/helper-pairup-functions"
+source "${BASH_SOURCE%/*}/pairup-helper-functions"
 
 main() {
   set -x
@@ -31,7 +31,7 @@ main() {
     cpanm -n -f $module || true
   done
 
-  SECTION "DONE! install-pairup-cpan is complete."
+  SECTION "DONE! pairup-install-cpan is complete."
 }
 
 [ "$0" == "${BASH_SOURCE[0]}" ] && main "$@";:
