@@ -10,7 +10,6 @@
   - Don't set tmux title
 - Clone all pairup repos
 - Put logs in window 5
-- TMUXKEY = q
 
 == Post-build
 - build perls
