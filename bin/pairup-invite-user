@@ -7,7 +7,7 @@ source "${BASH_SOURCE%/*}/pairup-helper-functions"
 main() {
   pair_user="${1:?user id required}"
 
-  echo "ssh -t $pair_user@$PAIRUP_IPADDR"
+  echo "ssh -t $pair_user@$PAIRUP_IPADDR pairup"
 }
 
 [ "$0" == "${BASH_SOURCE[0]}" ] && main "$@";:
