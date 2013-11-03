@@ -1,26 +1,47 @@
-ingydotnet/bpan-bash
-ingydotnet/dist-zilla-plugin-changesfromyaml
-ingydotnet/dist-zilla-pluginbundle-ingy-pm
-ingydotnet/io-all-pm
-ingydotnet/language-snusp-pm
+# Acmeism:
 ingydotnet/lola
-ingydotnet/mo-pm
-ingydotnet/pegex-pm
+ingydotnet/pairup
+ingydotnet/testml-pm
+ingydotnet/testml-rb
+ingydotnet/testml-tiny-pm
+
+acmeism/RosettaCodeData
 ingydotnet/rosettacode-pm
 
-ingydotnet/testml-pm
-ingydotnet/testml-tiny-pm
+# BPAN:
+ingydotnet/...
+ingydotnet/bpan-bash
+ingydotnet/config-ini-bash
+ingydotnet/example-bash
+ingydotnet/json-bash
+ingydotnet/lola-bash
 ingydotnet/test-more-bash
-ingydotnet/test-more-rb
+ingydotnet/test-simple-bash
+ingydotnet/test-tap-bash
+ingydotnet/plenv
 
+# Dist::Zilla:
+ingydotnet/dist-zilla-pluginbundle-ingy-pm
+carloslima/dist-zilla-plugin-changesfromyaml
+
+# CPAN
+ingydotnet/io-all-pm
+ingydotnet/language-snusp-pm
+ingydotnet/mo-pm
+ingydotnet/pegex-pm
 ingydotnet/vroom-pm
+ingydotnet/file-share-pm
 
+# Perl6
+
+# Ruby:
+ingydotnet/test-more-rb
+ingydotnet/scim-query-filter-parser-rb
+
+# YAML:
 ingydotnet/yaml-libyaml-pm
 ingydotnet/yaml-old-pm
 ingydotnet/yaml-pm
 ingydotnet/yaml-shell-pm
 ingydotnet/yaml-spec-tml
-
 Perl-Toolchain-Gang/YAML-Tiny
-
-acmeism/RosettaCodeData

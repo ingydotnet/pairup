@@ -12,6 +12,7 @@ export PairUp=/tmp/PairUp
 
 PATH="$PairUp/bin:$PATH" \
   source pairup-helper-functions
+# Install perldoc command:
 
 main() {
   set -x
@@ -52,14 +53,17 @@ main() {
   apt-get update --yes
   apt-get install \
     build-essential \
-    cpanminus \
+    curl \
     git-core \
     libssl-dev \
     weechat \
     --yes
 
+  SECTION "Install system cpanm:"
+  curl -L http://cpanmin.us | perl - App::cpanminus || continue?
+
   SECTION "Copy PairUp scripts into a PATH directory:"
-  cp $PairUp/bin/* /usr/local/bin/
+  cp -f $PairUp/bin/* /usr/local/bin/
 
   SECTION "chown -R %%admin_user%%:admin '$PairUp'"
   chown -R %%admin_user%%:admin "$PairUp"
