@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+source "${BASH_SOURCE%/*}/helper-pairup-functions"
+
+main() {
+  cat <<...
+PairUp Server Info:
+
+  Server Created:    $PAIRUP_STARTED
+  IP Address:        $PAIRUP_IPADDR
+  Admin User:        $PAIRUP_ADMIN
+  Pair User:         $PAIRUP_PAIR
+
+...
+}
+
+[ "$0" == "${BASH_SOURCE[0]}" ] && main "$@";:
