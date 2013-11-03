@@ -7,14 +7,20 @@ ingydotnet/lola
 ingydotnet/mo-pm
 ingydotnet/pegex-pm
 ingydotnet/rosettacode-pm
+
 ingydotnet/testml-pm
 ingydotnet/testml-tiny-pm
 ingydotnet/test-more-bash
 ingydotnet/test-more-rb
-ingydotnet/yaml-pm
-ingydotnet/yaml-old-pm
+
+ingydotnet/vroom-pm
+
 ingydotnet/yaml-libyaml-pm
+ingydotnet/yaml-old-pm
+ingydotnet/yaml-pm
+ingydotnet/yaml-shell-pm
 ingydotnet/yaml-spec-tml
 
 Perl-Toolchain-Gang/YAML-Tiny
+
 acmeism/RosettaCodeData
