@@ -1,10 +1,22 @@
+== Bugs
+- add-pairup-user chown failing
+
+== Commands
+- pairup-info
+- get all rsa keys when getting github keys
+
 == Conf
+- export PAIRUP_{ADMIN,PAIR,IPADDR,STARTTIME}
+- Configure weechat
+  - Don't set tmux title
+- Clone all pairup repos
+- Put logs in window 5
+- TMUXKEY = q
 
 == Post-build
 - build perls
 
 == Refactor
-- Make the add/del-user scripts be server side
 
 == Servers
 - Get working on HPCloud
