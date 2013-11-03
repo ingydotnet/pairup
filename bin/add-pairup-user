@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Usage: add-pair-user <user-id>
+# Usage: add-pair-user <user-id> [<github-user-id>]
 
 set -e
 
@@ -11,7 +11,9 @@ main() {
   set -x
 
   pair_user="${1:?userid required}"
+  github_user="$2"
   user="$pair_user"
+
   mkdir -p $PairUp/user/$pair_user
   assert-public-key
 

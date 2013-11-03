@@ -176,8 +176,13 @@ build-config() {
 # from GitHub, or error out:
 assert-public-key() {
   [ -e "$PairUp/user/$user/id_rsa.pub" ] && return
-  github_user=`grep -Esh "^$user:" $PairUp/user/github-users* | head -n1 | cut -d: -f2`
-  github_user="${github_user:-$user}"
+  if [ -z "$github_user" ]; then
+    github_user="$(
+      grep -Esh "^$user:" $PairUp/user/github-users* |
+      head -n1 | cut -d: -f2
+    )"
+    github_user="${github_user:-$user}"
+  fi
   key="$( curl --silent "https://api.github.com/users/$github_user/keys" |
     grep -E '^    "key": "ssh-rsa' | tail -n1 | cut -d'"' -f4
   )"

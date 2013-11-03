@@ -1,5 +1,6 @@
 #!/bin/bash
 
+[ -d ./PairUp ] && PairUp=./PairUp
 : "${PairUp:=/tmp/PairUp}"
 export PairUp
 
