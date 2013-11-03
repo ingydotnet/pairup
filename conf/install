@@ -4,10 +4,17 @@
 apt-get install ack-grep --yes
 ln -fs /usr/bin/ack-grep /usr/local/bin/ack
 
-git clone git@github.com:ingydotnet/git-hub ||
-  carp 'git clone git@github.com:ingydotnet/git-hub'
+# Install git-hub
+git clone https://github.com/ingydotnet/git-hub ||
+  carp 'git clone https://github.com/ingydotnet/git-hub'
+(cd git-hub; make install) || true
+rm -fr git-hub
 
-(cd git-hub; git submodule update --init; make install) || true
+# Install git-hub-travis
+git clone https://github.com/carloslima/git-hub-travis ||
+  carp 'git clone https://github.com/carloslima/git-hub-travis'
+(cd git-hub-travis; make install) || true
+rm -fr git-hub-travis
 
 apt-get install perl-doc ||
   carp 'apt-get install perl-doc'
