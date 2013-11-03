@@ -24,6 +24,11 @@ ingydotnet/plenv
 ingydotnet/dist-zilla-pluginbundle-ingy-pm
 carloslima/dist-zilla-plugin-changesfromyaml
 
+# Dots:
+PairUp/irc-dots
+PairUp/unicode-dots
+PairUp/pairup-dots
+
 # CPAN
 ingydotnet/io-all-pm
 ingydotnet/language-snusp-pm

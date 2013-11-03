@@ -5,11 +5,10 @@
 - get all rsa keys when getting github keys
 
 == Conf
-- export PAIRUP_{ADMIN,PAIR,IPADDR,STARTTIME}
-- Configure weechat
-  - Don't set tmux title
+- clone repos into dirs
+  - allow symlinks across genres
+  - @Acmeism @Perl @PairUp
 - Clone all pairup repos
-- Put logs in window 5
 
 == Post-build
 - build perls
@@ -18,13 +17,14 @@
 
 == Servers
 - Get working on HPCloud
-- Get working on other Linux distros
 
 == Test
-- Test the --NP flag
+- Test on HPCloud
 
 == Tmux
+- Put logs in window 5
 
 == WeeChat
 - Config weechat
   - irc-dots
+  - Don't set tmux title
