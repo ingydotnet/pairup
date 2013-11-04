@@ -29,7 +29,7 @@ main() {
 
     mkdir -p /home/%%admin_user%%/.ssh
     chmod 700 /home/%%admin_user%%/.ssh
-    cp $PairUp/user/%%admin_user%%/id_rsa.pub /home/%%admin_user%%/.ssh/authorized_keys
+    cp $PairUp/user/%%admin_user%%/authorized_keys /home/%%admin_user%%/.ssh/authorized_keys
     chown -R %%admin_user%%:admin /home/%%admin_user%%/.ssh
 
     # No password for sudo:
@@ -42,7 +42,7 @@ main() {
 
     mkdir -p /home/%%pair_user%%/.ssh
     chmod 700 /home/%%pair_user%%/.ssh
-    cp $PairUp/user/%%pair_user%%/id_rsa.pub /home/%%pair_user%%/.ssh/authorized_keys
+    cp $PairUp/user/%%pair_user%%/authorized_keys /home/%%pair_user%%/.ssh/authorized_keys
     chown -R %%pair_user%%:%%pair_user%% /home/%%pair_user%%/.ssh
   }
 

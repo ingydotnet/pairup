@@ -46,8 +46,8 @@ main() {
   # server setup. This is the only time you need to enter the password. All
   # pubkey afterwards:
   if [ "$root_user" == root ]; then
-    cat "PairUp/user/$admin_user/id_rsa.pub" | ssh "$root_user@$ip_address" \
-      "cat > k; mkdir -p .ssh; chmod 700 .ssh; mv k .ssh/authorized_keys"
+    cat "PairUp/user/$admin_user/authorized_keys" | ssh "$root_user@$ip_address" \
+      "cat > ak; mkdir -p .ssh; chmod 700 .ssh; mv ak .ssh/authorized_keys"
   fi
 
   # Copy PairUp dir over to root:
@@ -155,7 +155,7 @@ build-config() {
     done
     [ "$user" == private ] && continue
     mkdir -p "$PairUp/user/$user"
-    [ -d "user/$user" ] &&
+    [ -d "user/$user" -a -n "$(ls -A "user/$user")" ] &&
       cp -r user/"$user"/* "$PairUp/user/$user/"
     assert-public-key
   done
@@ -173,22 +173,25 @@ build-config() {
   done
 }
 
-# Use the rsa public key under ./user/$user/id_rsa.pub or attempt to get one
+# Use the rsa public key under ./user/$user/authorized_keys or attempt to get one
 # from GitHub, or error out:
 assert-public-key() {
-  [ -e "$PairUp/user/$user/id_rsa.pub" ] && return
+  [ -e "$PairUp/user/$user/authorized_keys" ] && return
   if [ -z "$github_user" ]; then
-    github_user="$(
+    local github_user="$(
       grep -Esh "^$user:" $PairUp/user/github-users* |
       head -n1 | cut -d: -f2
     )"
     github_user="${github_user:-$user}"
   fi
-  key="$( curl --silent "https://api.github.com/users/$github_user/keys" |
-    grep -E '^    "key": "ssh-rsa' | tail -n1 | cut -d'"' -f4
-  )"
-  [ -n "$key" ] || die "Can't find a public key for user '$user:$github_user'"
-  echo "$key" > "$PairUp/user/$user/id_rsa.pub"
+  keys=(
+    $(
+      curl --silent "https://api.github.com/users/$github_user/keys" |
+        grep -E '^    "key": "ssh-rsa' | cut -d'"' -f4
+    )
+  )
+  [ ${#keys[@]} > 0 ] || die "Can't find a public key for user '$user:$github_user'"
+  (IFS=$'\n'; echo "${keys[*]}" > "$PairUp/user/$user/authorized_keys")
 }
 
 # Start the PairUp server setup:
