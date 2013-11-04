@@ -10,5 +10,4 @@ dots:
 # This one is broken currently
 # - repo: git@github.com:PairUp/unicode-dots.git
 - repo: git@github.com:PairUp/tmux-dots.git
-# This one is rkings personal. too many chans
-# - repo: git@github.com:PairUp/irc-dots.git
+- repo: git@github.com:PairUp/weechat-dots.git
