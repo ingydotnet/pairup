@@ -1,11 +1,11 @@
 ## Name
 
-Pairup -- Fast, Custom, Throwaway Pair Programming VPS
+PairUp -- Fast, Custom, Throwaway Pair Programming VPS
 
 ## Synopsis
 
 Create a debian-based VPS somewhere (RackSpace/HPCloud/AWS). Note the
-ip_address and root password.
+ip_address and (on RackSpace at least) root password.
 
 Then run:
 
@@ -45,14 +45,14 @@ good).
 To do PairUp effectively, you will want the config files with the private info
 need to run the software you like. You will almost certainly want to forward
 SSH. The point is that if your pair is malicious they can probably get some of
-your credentials. Pair with people you know and trust and would have no problem
-letting them use your laptop while you went to the bathroom.
+your credentials. Pair with people you know and trust and that you would have
+no problem letting them use your laptop while you went to the bathroom.
 
-Known threats/leaks:
+A few possible known threats/leaks:
 
     - SSH_AUTH_SOCK             - Pair can SSH anywhere you can
-    - ~/git-hub/config          - GitHub auth token
-    - ~/pause                   - CPAN password
+    - ~/.git-hub/config         - GitHub auth token
+    - ~/.pause                  - CPAN password
 
 ## Community
 
@@ -61,4 +61,3 @@ Known threats/leaks:
 Please add to this doc and this repo in general.
 
 Let's PairUp soon, Ingy döt Net
-
