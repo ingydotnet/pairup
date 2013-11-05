@@ -10,6 +10,9 @@
   - @Acmeism @Perl @PairUp
 - Clone all pairup repos
 
+== Install
+- Install modern ack
+
 == Post-build
 - build perls
 
@@ -28,3 +31,5 @@
 - Config weechat
   - irc-dots
   - Don't set tmux title
+- Set nick based on pair: ingy^xdg
+- Install and set up bitlbee
