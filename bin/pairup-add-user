@@ -20,7 +20,7 @@ main() {
   adduser --disabled-password --gecos '' $pair_user
   mkdir -p /home/$pair_user/.ssh
   chmod 700 /home/$pair_user/.ssh
-  cp $PairUp/user/$pair_user/authorized_keys /home/$pair_user/.ssh/authorized_keys
+  cp $PairUp/user/$pair_user/authorized_keys* /home/$pair_user/.ssh/
   chown -R "$pair_user"."$pair_user" /home/$pair_user/.ssh
 }
 

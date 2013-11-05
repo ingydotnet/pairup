@@ -176,7 +176,10 @@ build-config() {
 # Use the rsa public key under ./user/$user/authorized_keys or attempt to get one
 # from GitHub, or error out:
 assert-public-key() {
-  [ -e "$PairUp/user/$user/authorized_keys" ] && return
+  if [ -e "$PairUp/user/$user/authorized_keys" ] ||
+     [ -e "$PairUp/user/$user/authorized_keys2" ]; then
+      return
+  fi
   if [ -z "$github_user" ]; then
     local github_user="$(
       grep -Esh "^$user:" $PairUp/user/github-users* |
@@ -188,8 +191,15 @@ assert-public-key() {
   curl --silent "https://api.github.com/users/$github_user/keys" |
     grep -E '^    "key": "ssh-rsa' | cut -d'"' -f4 > \
       "$PairUp/user/$user/authorized_keys"
-  [ -s "$PairUp/user/$user/authorized_keys" ] ||
-    die "Can't find a public key for user '$user:$github_user'"
+  if [ ! -s "$PairUp/user/$user/authorized_keys" ]; then
+    if [ ! -s "$PairUp/user/$user/authorized_keys2" ]; then
+      curl --silent "https://api.github.com/users/$github_user/keys" |
+        grep -E '^    "key": "ssh-dss' | cut -d'"' -f4 > \
+          "$PairUp/user/$user/authorized_keys2"
+      [ -s "$PairUp/user/$user/authorized_keys2" ] ||
+        die "Can't find a public key for user '$user:$github_user'"
+    fi
+  fi
 }
 
 # Start the PairUp server setup:
