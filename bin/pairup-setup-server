@@ -155,7 +155,7 @@ build-config() {
     done
     [ "$user" == private ] && continue
     mkdir -p "$PairUp/user/$user"
-    [ -d "user/$user" -a -n "$(ls -A "user/$user")" ] &&
+    [[ -d "user/$user" ]] && [[ -n "$(ls -A "user/$user")" ]] &&
       cp -r user/"$user"/* "$PairUp/user/$user/"
     assert-public-key
   done
@@ -184,14 +184,12 @@ assert-public-key() {
     )"
     github_user="${github_user:-$user}"
   fi
-  keys=(
-    $(
-      curl --silent "https://api.github.com/users/$github_user/keys" |
-        grep -E '^    "key": "ssh-rsa' | cut -d'"' -f4
-    )
-  )
-  [ ${#keys[@]} > 0 ] || die "Can't find a public key for user '$user:$github_user'"
-  (IFS=$'\n'; echo "${keys[*]}" > "$PairUp/user/$user/authorized_keys")
+  keys=()
+  curl --silent "https://api.github.com/users/$github_user/keys" |
+    grep -E '^    "key": "ssh-rsa' | cut -d'"' -f4 > \
+      "$PairUp/user/$user/authorized_keys"
+  [ -s "$PairUp/user/$user/authorized_keys" ] ||
+    die "Can't find a public key for user '$user:$github_user'"
 }
 
 # Start the PairUp server setup:
