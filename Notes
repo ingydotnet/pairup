@@ -8,6 +8,10 @@
 == Conf
 - clone into dirs optionally
   - package-tag -> ++
+- pairup-add-user pulls in pair's conf
+
+== Git
+- https://github.com/rjbs/rjbs-git
 
 == Install
 - Install modern ack
