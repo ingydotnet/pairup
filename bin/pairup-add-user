@@ -8,8 +8,6 @@ source "${BASH_SOURCE%/*}/pairup-helper-functions"
 source $PairUp/bin/pairup-setup-server
 
 main() {
-  set -x
-
   pair_user="${1:?userid required}"
   github_user="$2"
   user="$pair_user"
@@ -22,6 +20,11 @@ main() {
   chmod 700 /home/$pair_user/.ssh
   cp $PairUp/user/$pair_user/authorized_keys /home/$pair_user/.ssh/authorized_keys
   chown -R "$pair_user"."$pair_user" /home/$pair_user/.ssh
+
+  echo "New user '$pair_user' can join with:"
+  echo
+  echo "    ssh -t $pair_user@$PAIRUP_IPADDR pairup"
+  echo
 }
 
 [ "$0" == "${BASH_SOURCE[0]}" ] && main "$@";:

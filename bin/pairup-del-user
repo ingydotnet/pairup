@@ -7,8 +7,6 @@ set -e
 source "${BASH_SOURCE%/*}/pairup-helper-functions"
 
 main() {
-  set -x
-
   pair_user="${1:?userid required}"; shift
 
   options=()
@@ -24,6 +22,8 @@ main() {
   done
 
   deluser "$pair_user" ${options[*]}
+
+  echo "User '$pair_user' deleted."
 }
 
 [ "$0" == "${BASH_SOURCE[0]}" ] && main "$@";:
