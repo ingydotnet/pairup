@@ -1,14 +1,13 @@
 == Bugs
 
 == Commands
-- pairup-info
-- get all rsa keys when getting github keys
+- add-user prints invite command
+- pairup command rejoins from laptop or from server
+- make server ip= pair=
 
 == Conf
-- clone repos into dirs
-  - allow symlinks across genres
-  - @Acmeism @Perl @PairUp
-- Clone all pairup repos
+- clone into dirs optionally
+  - package-tag -> ++
 
 == Post-build
 - build perls
@@ -16,15 +15,14 @@
 == Refactor
 
 == Servers
-- Get working on HPCloud
 
 == Test
-- Test on HPCloud
+
+== UX
+- user account should be pairup instead of $admin_user
 
 == Tmux
 - Put logs in window 5
 
 == WeeChat
-- Config weechat
-  - irc-dots
   - Don't set tmux title

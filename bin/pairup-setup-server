@@ -78,11 +78,11 @@ get-opts() {
       echo "$Usage"
       exit 0
       ;;
-    --HP)                             # HPCloud (different root model)
+    --HP|-HP|HP)                      # HPCloud (different root model)
       sudo=sudo
       root_user=ubuntu
       ;;
-    --BO)                             # Build Only (testing ./PairUp/)
+    --BO|-BO|BO)                      # Build Only (testing ./PairUp/)
       PAIRUP_BUILD_ONLY=1
       ;;
     -*)
@@ -192,6 +192,7 @@ assert-public-key() {
     grep -E '^    "key": "ssh-rsa' | cut -d'"' -f4 > \
       "$PairUp/user/$user/authorized_keys"
   if [ ! -s "$PairUp/user/$user/authorized_keys" ]; then
+    rm "$PairUp/user/$user/authorized_keys"
     if [ ! -s "$PairUp/user/$user/authorized_keys2" ]; then
       curl --silent "https://api.github.com/users/$github_user/keys" |
         grep -E '^    "key": "ssh-dss' | cut -d'"' -f4 > \
