@@ -1,3 +1,7 @@
+== Auth
+
+- Remove bad known_key on error
+
 == Bugs
 
 == Commands
