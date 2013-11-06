@@ -68,8 +68,6 @@ main() {
   SECTION "chown -R %%admin_user%%:admin '$PairUp'"
   chown -R %%admin_user%%:admin "$PairUp"
 
-  SECTION "TODO - scramble root password"
-
   SECTION "DONE! root-setup is complete."
 }
 
