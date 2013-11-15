@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+
+main() {
+  termcast --host termcast.pairup.net
+}
+
+[ "$0" == "${BASH_SOURCE[0]}" ] && main "$@";:
