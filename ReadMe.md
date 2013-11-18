@@ -37,7 +37,7 @@ PairUp makes use of a project called ... (DotDotDot) that stores various
 settings in many repos and merges them correctly. You and your pair both have
 your dots preselected, and ... does the rest.
 
-== Status
+## Status
 
 PairUp is currently targeted at Debian systems (Ubuntu 12.04 is known to work
 good). It has been fully tested on RackSpace and HPCloud images.
