@@ -1,5 +1,6 @@
 # CPAN modules to install:
 
+App::Termcast
 Devel::Local
 IO::All
 JSON
