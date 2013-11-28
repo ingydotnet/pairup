@@ -21,7 +21,7 @@ main() {
     esac
   done
 
-  deluser "$pair_user" ${options[*]}
+  sudo deluser "$pair_user" ${options[*]}
 
   echo "User '$pair_user' deleted."
 }
