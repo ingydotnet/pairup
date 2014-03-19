@@ -1,0 +1,200 @@
+#!/usr/bin/env bash
+
+# Create a new HP server and print ip-address
+
+set -e
+
+export PATH="$(
+  set -- ${0%/*}/../ext/*/{bin,lib} ${0%/*}/../{bin,lib}
+  IFS=:; echo "$*"
+):$PATH"
+
+source bash+ :std
+
+use BashMore
+
+OPTIONS_SPEC="\
+$0 [<option>...] <server-name>
+
+Options:
+--
+h           Show the command summary
+ 
+c,config=   Config file
+t,type=     Server image type id
+f,flavor=   Server flavor
+s,secgroup= Security group
+k,keyname=  SSH key pair name
+i,ipaddr=   Floating ip address
+"
+
+main() {
+  local cache="conf/server/hpcs.cache"
+
+  get-opts "$@"
+
+  check-config
+
+  check-server-name "$server_name"
+
+  for v in image_type image_flavor sec_group key_name ip_addr; do
+    get-var-$v
+  done
+
+  create-server
+
+  echo "Server warming up…"
+  sleep 20
+
+  add-ip-address
+
+  echo "New HP server instance '$server_name' created:"
+
+  nova list
+}
+
+create-server() {
+  (
+    set -x
+
+    nova boot \
+      --image=$image_type \
+      --flavor=$image_flavor \
+      --security-group=$sec_group \
+      --key-name=$key_name \
+      "$server_name"
+  )
+}
+
+add-ip-address() {
+  (
+    set -x
+
+    nova floating-ip-associate "$server_name" "$ip_addr"
+  )
+}
+
+check-config() {
+  if [ -n "$config_file" ]; then
+    source "$config_file"
+    cache="$config_file.cache"
+  fi
+  local v vars=(
+    OS_TENANT_NAME
+    OS_USERNAME
+    OS_PASSWORD
+    OS_AUTH_URL
+    OS_REGION_NAME
+  )
+  for v in ${vars[@]}; do
+    [ -n "${!v}" ] || die "Variable '$v' is not set"
+  done
+}
+
+check-server-name() {
+  local output="$(nova list | grep -e " $server_name ")"
+  if [ -n "$output" ]; then
+    die "There is already a server called '$server_name'.\n"
+  fi
+}
+
+get-var-image_type() {
+  [ -n "$image_type" ] && return
+  nova image-list
+  default="$(git config -f $cache server.image-type || true)"
+  image_type="$(
+    prompt "Enter an image ID [$default]: " "$default"
+  )"
+  git config -f $cache server.image-type "$image_type"
+}
+
+get-var-image_flavor() {
+  [ -n "$image_flavor" ] && return
+  nova flavor-list
+  local default="$(git config -f $cache server.image-flavor)"
+  image_flavor="$(
+    prompt "Enter a flavor ID [$default]: " "$default"
+  )"
+  git config -f $cache server.image-flavor "$image_flavor"
+}
+
+get-var-sec_group() {
+  [ -n "$sec_group" ] && return
+  nova secgroup-list
+  local default="$(git config -f $cache server.sec-group)"
+  sec_group="$(
+    prompt "Enter a secgroup ID [$default]: " "$default"
+  )"
+  git config -f $cache server.sec-group "$sec_group"
+}
+
+get-var-key_name() {
+  [ -n "$key_name" ] && return
+  nova keypair-list
+  local default="$(git config -f $cache server.key-name)"
+  key_name="$(
+    prompt "Enter a secgroup ID [$default]: " "$default"
+  )"
+  git config -f $cache server.key-name "$key_name"
+}
+
+get-var-ip_addr() {
+  [ -n "$ip_addr" ] && return
+  nova floating-ip-list | grep -v -E '10\.0\.'
+  local default="$(git config -f $cache server.ip-addr)"
+  ip_addr="$(
+    prompt "Enter a floating IP address [$default]: " "$default"
+  )"
+  git config -f $cache server.ip-addr "$ip_addr"
+}
+
+get-opts() {
+  [ $# -eq 0 ] && set -- --help
+
+  eval "$(
+    echo "$OPTIONS_SPEC" |
+      git rev-parse --parseopt -- "$@" ||
+    echo exit $?
+  )"
+
+  while [ $# -gt 0 ]; do
+    local option="$1"; shift
+    case "$option" in
+      -c)
+        config_file=$1
+        shift
+        ;;
+      -t)
+        image_type=$1
+        shift
+        ;;
+      -f)
+        image_flavor=$1
+        shift
+        ;;
+      -f)
+        ip_addr=$1
+        shift
+        ;;
+      -s)
+        sec_group=$1
+        shift
+        ;;
+      --) break ;;
+      *) die "Unexpected option: $option" ;;
+    esac
+  done
+
+  server_name="$1"; shift
+  [ -n "$server_name" ] || die "server-name required"
+  [ $# -eq 0 ] || die "Unknown options '$@'"
+}
+
+#------------------------------------------------------------------------------
+# Begin at the end!
+#------------------------------------------------------------------------------
+[ "${BASH_SOURCE[0]}" == "$0" ] && main "$@"
+
+true
+
+# vim: set lisp:

@@ -33,7 +33,8 @@ bin/pairup-install-cpan
 bin/pairup-install-repos
 bin/pairup-install-software
 bin/pairup-invite-user
-bin/pairup-setup-server
+bin/pairup-server-setup
+bin/pairup-server-new-hp
 template/admin-setup
 template/root-setup
 ...

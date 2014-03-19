@@ -5,7 +5,7 @@
 set -e
 
 source "${BASH_SOURCE%/*}/pairup-helper-functions"
-source "${BASH_SOURCE%/*}/pairup-setup-server"
+source "${BASH_SOURCE%/*}/pairup-server-setup"
 
 main() {
   pair_user="${1:?userid required}"

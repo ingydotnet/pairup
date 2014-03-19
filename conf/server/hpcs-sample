@@ -1,0 +1,14 @@
+# This is a sample credentials file need to use Nova with HPCS:
+
+# Credentials
+export OS_TENANT_NAME=you@email.com-tenant1
+export OS_USERNAME=you
+export OS_PASSWORD=ABCD1234+QRSP987
+
+# West
+export OS_AUTH_URL=https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/
+export OS_REGION_NAME=region-a.geo-1
+
+# East
+# export OS_AUTH_URL=https://region-b.geo-1.identity.hpcloudsvc.com:35357/v2.0/
+# export OS_REGION_NAME=region-b.geo-1

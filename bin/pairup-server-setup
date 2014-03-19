@@ -8,7 +8,15 @@
 
 set -e
 
-USAGE="Usage: ${0##*/} <ip-address> <pair-user-id> [<admin-user-id>]"
+USAGE="\
+${0##*/} <ip-address> <options>
+
+g, guser=     GitHub ID of user to create
+u, user=      User ID to create
+p, project=   Project name to include
+t, type=      Type of server (EC2, HP, RS)
+
+"
 
 source "${BASH_SOURCE%/*}/pairup-helper-functions"
 
@@ -104,6 +112,14 @@ get-opts() {
   ip_address="$1"
   pair_user="$2"
   admin_user="${3:-$USER}"
+
+  # Detect HPCS:
+  if [[ "$ip_address" =~ ^15\.125\. ]]; then
+    sudo=sudo
+    root_user=ubuntu
+  fi
+
+  true
 }
 
 # cd to the pairup repo directory:
