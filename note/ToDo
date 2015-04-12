@@ -1,0 +1,3 @@
+- Install plenv and build perls
+- Install modules under main plenv version
+- Install and fix Devel::Local
