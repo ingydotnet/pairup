@@ -1,12 +1,14 @@
-Dist::Zilla::PluginBundle::INGY
-Dist::Zilla::Plugin::ChangesFromYaml
-Dist::Zilla::Plugin::VersionFromModule
-Dist::Zilla::Plugin::ModuleIncluder
+Zilla::Dist
 
-Vroom
-
-YAML
-YAML::Syck
-YAML::Tiny
-YAML::XS
-YAML::Shell
+# Dist::Zilla::PluginBundle::INGY
+# Dist::Zilla::Plugin::ChangesFromYaml
+# Dist::Zilla::Plugin::VersionFromModule
+# Dist::Zilla::Plugin::ModuleIncluder
+#
+# Vroom
+#
+# YAML
+# YAML::Syck
+# YAML::Tiny
+# YAML::XS
+# YAML::Shell
