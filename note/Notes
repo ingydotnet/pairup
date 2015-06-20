@@ -1,10 +1,11 @@
 == Auth
-
 - Remove bad known_key on error
 
 == Bugs
+- PairUp add-user not showing ip addr
 
 == Commands
+- support ingy:ingydotnet syntax (setup-server, add-user)
 - add-user prints invite command
 - pairup command rejoins from laptop or from server
 - make server ip= pair=
@@ -24,11 +25,28 @@
 - Install modern ack
 
 == Post-build
+- build plenv perl
 - build perls
 
 == Refactor
 
+== Security
+- Test leak scenarios
+  - .pause
+  - SSH_AUTH_SOCK
+
+== See
+- https://pair.io/
+- https://github.com/therubymug/hitch
+- http://www.pairprogramwith.me/
+- http://tmate.io/
+- http://syme.herokuapp.com/faq
+- https://github.com/RichiH/vcsh
+
 == Servers
+
+== Setup
+- Carp if server is already setup
 
 == Test
 
@@ -39,6 +57,6 @@
 - Put logs in window 5
 
 == WeeChat
-  - Don't set tmux title
+- Don't set tmux title
 - Set nick based on pair: ingy^xdg
 - Install and set up bitlbee
