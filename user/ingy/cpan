@@ -1,14 +1,7 @@
+Devel::Local
+IO::All
+XXX
+YAML
+YAML::Shell
+YAML::XS
 Zilla::Dist
-
-# Dist::Zilla::PluginBundle::INGY
-# Dist::Zilla::Plugin::ChangesFromYaml
-# Dist::Zilla::Plugin::VersionFromModule
-# Dist::Zilla::Plugin::ModuleIncluder
-#
-# Vroom
-#
-# YAML
-# YAML::Syck
-# YAML::Tiny
-# YAML::XS
-# YAML::Shell
