@@ -1,22 +1,23 @@
-## Name
+PairUp
+======
 
-PairUp -- Fast, Custom, Throwaway Pair Programming VPS
+Fast, Custom, Throwaway Pair Programming VPS
 
-## Synopsis
+= Synopsis
 
-Create a debian-based VPS somewhere (RackSpace/HPCloud/AWS). Note the
-ip_address and (on RackSpace at least) root password.
+Create a debian-based VPS somewhere (DigitalOcean/RackSpace/HPCloud/AWS). Note
+the ip_address and (on RackSpace at least) root password.
 
 Then run:
 
-    ./bin/pairup-setup-server <ip-address> [<pair-user-id> [<admin-user-id>]]
+  ./bin/pairup-setup-server <ip-address> [<pair-user-id> [<admin-user-id>]]
 
 Soon you will find your self in a remote tmux wonderland, customized exactly
 the way that you your pair like it.
 
 Write some code, share a laugh, push to GitHub, shut it down.
 
-## Description
+= Description
 
 Pair programming is great. If you have never done it you are in for a treat.
 
@@ -37,14 +38,14 @@ PairUp makes use of a project called ... (DotDotDot) that stores various
 settings in many repos and merges them correctly. You and your pair both have
 your dots preselected, and ... does the rest.
 
-## Status
+= Status
 
 PairUp is currently targeted at Debian systems (Ubuntu 12.04 is known to work
 good). It has been fully tested on RackSpace and HPCloud images.
 
-## Community
+= Community
 
-    /join irc.freenode.net#pairup
+IRC: `irc.freenode.net#pairup`
 
 Please add to this doc and this repo in general.
 
