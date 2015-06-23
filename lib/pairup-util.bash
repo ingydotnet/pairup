@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# [ -d ./PairUp ] && PairUp=./PairUp
-: "${PairUp:=/tmp/PairUp}"
-export PairUp
+export PairUp=.PairUp
 
 die() { set +x; echo "$@" >&2; exit 1; }
 
@@ -42,6 +40,12 @@ SECTION() {
   )
 }
 
+run-section-cmd() {
+  [ -n "$log" ] ||
+    die "Missing 'log' running section command '$section_command'"
+  $section_command &>> $log || carp &>> $log &
+}
+
 tests_ok() {
   local path="$BASH_SOURCE"
   [[ "$path" =~ ^bin/ ]] && path="./$path"
@@ -57,4 +61,5 @@ export -f carp
 export -f continue?
 export -f die
 export -f SECTION
+export -f run-section-cmd
 export -f tests_ok

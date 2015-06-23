@@ -13,7 +13,7 @@ PairUp - Fast, Custom, Throwaway Pair Programming VPS
 =head1 Synopsis
 
 Create a debian-based VPS somewhere (DigitalOceanI<RackSpace>HPCloud/AWS).
-Note the ip_address and (on RackSpace at least) root password.
+Note the vm_address and (on RackSpace at least) root password.
 
 Then run:
 

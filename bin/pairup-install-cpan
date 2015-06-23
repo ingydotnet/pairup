@@ -34,4 +34,4 @@ main() {
   SECTION "DONE! pairup-install-cpan is complete."
 }
 
-[ "$0" == "${BASH_SOURCE[0]}" ] && main "$@";:
+[ "$0" != "$BASH_SOURCE" ] || main "$@"

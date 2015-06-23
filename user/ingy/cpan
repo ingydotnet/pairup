@@ -1,7 +1,0 @@
-Devel::Local
-IO::All
-XXX
-YAML
-YAML::Shell
-YAML::XS
-Zilla::Dist

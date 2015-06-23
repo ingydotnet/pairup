@@ -1,9 +1,10 @@
 # CPAN modules to install:
 
-App::Termcast
 Devel::Local
 IO::All
 JSON
 JSON::XS
 XXX
+YAML
+YAML::Shell
 YAML::XS

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e
+
+# This patch is only for Ubuntu 14.04
+[ -e /etc/lsb-release ] || exit 0
+source /etc/lsb-release
+[ "$DISTRIB_RELEASE" == '14.04' ] || exit 0
+
+target=${1:-/usr/share/vim/vim74/autoload/netrw.vim}
+cp "$target" "$target-$(date +'%s')"
+
+patch --force --reject-file=- $target <<'...' || true
+--- a
++++ b
+@@ -4393,7 +4393,10 @@
+     " if its local only: LocalBrowseCheck() doesn't edit a file, but NetrwBrowse() will
+     if a:islocal
+ "     call Decho("(NetrwBrowseChgDir:edit-a-file) edit local file: exe e! ".fnameescape(dirname))
+-     exe "keepj keepalt e! ".fnameescape(dirname)
++     " exe "keepj keepalt e! ".fnameescape(dirname)
++     " XXX Set old behaviour to keep dirs as alts:
++     " Actually fixed for real in vim-7.4.56
++     exe "keepj e! ".fnameescape(dirname)
+      call s:NetrwCursor()
+     else
+ "     call Decho("(NetrwBrowseChgDir:edit-a-file) remote file: NetrwBrowse will edit it")
+...

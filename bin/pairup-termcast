@@ -6,4 +6,4 @@ main() {
   termcast --host termcast.pairup.net
 }
 
-[ "$0" == "${BASH_SOURCE[0]}" ] && main "$@";:
+[ "$0" != "$BASH_SOURCE" ] || main "$@"

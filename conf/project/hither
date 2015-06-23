@@ -1,0 +1,12 @@
+git-hub/config
+git hub clone hither ~/src/hither
+sudo apt-get install postgresql postgresql-server-dev-all python-virtualenv python2.7-dev
+nvm
+nvm install v0.10.24
+nvm use v0.10.24
+npm install -g coffee-script
+npm install js-yaml pg-json-schema-export
+vim netrw patch
+git clone git://github.com/tokuhirom/plenv.git ~/.plenv
+
+https://gist.github.com/64083ba2a9e873cbe305

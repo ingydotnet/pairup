@@ -1,5 +1,0 @@
-
-Connect to PairUp with:
-
-    ssh -t %%ip_address%% pairup
-

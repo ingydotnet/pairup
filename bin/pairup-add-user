@@ -23,8 +23,8 @@ main() {
 
   echo "New user '$pair_user' can join with:"
   echo
-  echo "    ssh -t $pair_user@$PAIRUP_IPADDR pairup"
+  echo "    ssh -t $pair_user@$PAIRUP_VMADDR pairup"
   echo
 }
 
-[ "$0" == "${BASH_SOURCE[0]}" ] && main "$@";:
+[ "$0" != "$BASH_SOURCE" ] || main "$@"

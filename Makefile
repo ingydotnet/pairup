@@ -19,4 +19,4 @@ test:
 	prove -v test/
 
 clean purge:
-	rm -fr PairUp
+	rm -fr .PairUp

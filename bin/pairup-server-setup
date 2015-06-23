@@ -3,45 +3,63 @@
 #------------------------------------------------------------------------------
 # Setup a Debian-based VPS for remote pair hacking.
 #
-# It is tested on Ubuntu 12.04.
+# It is tested on Ubuntu 12.04 and 14.04.
 #------------------------------------------------------------------------------
+
+# TODO:
+# - Allow -u user:githubuser
+# - Use `git rev-parse` to parse options
+# - Support 0-n user list. Default to ($USER:$USER)
+# - Support multiple -p projects
 
 set -e
 
-USAGE="\
-${0##*/} <ip-address> <options>
+GETOPT_SPEC="\
+${0##*/} <ip-address> [<pairup-userid>...] <options>
 
-g, guser=     GitHub ID of user to create
-u, user=      User ID to create
-p, project=   Project name to include
-t, type=      Type of server (EC2, HP, RS)
+Set up a brand new remote VM for PairUp.
 
+Options:
+--
+h           Help
+q,quiet     Show minimal output
+v,verbose   Show verbose output
+ 
+a,admin=        Admin UserID (default to \$USER)
+p,project=      Project name to include
+ 
+A,aws           Remote VM is on AWS
+D,digitalocean  Remote VM is on DigitalOcean
+H,hpcloud       Remote VM is on HP Cloud
+L,liquidweb     Remote VM is on Liquid Web
+R,rackspace     Remote VM is on Rackspace
+ 
+B,build-only    Just build the PairUp directory
 "
 
-source "${BASH_SOURCE%/*}/pairup-helper-functions"
+source "${BASH_SOURCE%/*}/../lib/pairup-util.bash"
 
 # main() is called at bottom of this file:
 main() {
   # "Global" variables we use:
-  local root_user=root sudo=
-  local ip_address= admin_user= pair_user=
+  local root_user= sudo=
+  local vm_address= admin_user= pair_users=
+  local quiet_output= verbose_output=
 
-  # Parse command line options:
-  get-opts "$@"
   # Make sure our runtime environment is ok:
-  setup
+  assert-env
 
   # XXX For now we run the test suite every time:
   tests_ok ||
     die "The pairup test suite is failing. You should look into that."
 
-  # Stage custom scripts in ./PairUp/
-  (
-    PairUp=./PairUp
-    build-config
-  )
+  # Parse command line options:
+  get-opts "$@"
 
-  # Exit if just testing ./PairUp/
+  # Stage custom scripts in ./.PairUp/
+  build-config
+
+  # Exit if just testing ./.PairUp/
   if [ -n "$PAIRUP_BUILD_ONLY" ]; then
     echo 'Build complete'
     exit
@@ -54,18 +72,19 @@ main() {
   # server setup. This is the only time you need to enter the password. All
   # pubkey afterwards:
   if [ "$root_user" == root ]; then
-    cat "PairUp/user/$admin_user/authorized_keys" | ssh "$root_user@$ip_address" \
+    cat "$PairUp/keys/${admin_user%:*}/authorized_keys" |
+      ssh "$root_user@$vm_address" \
       "cat > ak; mkdir -p .ssh; chmod 700 .ssh; mv ak .ssh/authorized_keys"
   fi
 
   # Copy PairUp dir over to root:
-  rsync -avz PairUp/ "$root_user@$ip_address:$PairUp"
+  rsync -avz $PairUp/ "$root_user@$vm_address:$PairUp"
 
   # Run the interactive root script:
-  ssh -t "$root_user@$ip_address" $sudo bash "$PairUp/root-setup"
+  ssh -t "$root_user@$vm_address" $sudo bash "$PairUp/root-setup"
 
   # Run the interactive admin_user script:
-  ssh -t "$admin_user@$ip_address" bash "$PairUp/admin-setup" \
+  ssh -t "${admin_user%:*}@$vm_address" bash "$PairUp/admin-setup" \
     || true   # Show reconnect msg if the tmux fails
 
   # \oXo/
@@ -73,57 +92,18 @@ main() {
   # \oXo/
 
   # Tell admin user how to reconnect when they leave tmux session:
-  cat PairUp/reconnect
-}
-
-# Parse command line args:
-get-opts() {
-  local args=()
-
-  for arg; do
-    case "$arg" in
-    -?|-h|--help)
-      echo "$Usage"
-      exit 0
-      ;;
-    --HP|-HP|HP)                      # HPCloud (different root model)
-      sudo=sudo
-      root_user=ubuntu
-      ;;
-    --BO|-BO|BO)                      # Build Only (testing ./PairUp/)
-      PAIRUP_BUILD_ONLY=1
-      ;;
-    -*)
-      die "Unknown option: '$arg'"
-      ;;
-    *)
-      args+=("$arg")
-      ;;
-    esac
-  done
-
-  set -- "${args[@]}"
-
-  if [ $# -lt 2 -o $# -gt 3 ] ||
-    [[ ! "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-      die "$USAGE"
-  fi
-
-  ip_address="$1"
-  pair_user="$2"
-  admin_user="${3:-$USER}"
-
-  # Detect HPCS:
-  if [[ "$ip_address" =~ ^15\.125\. ]]; then
-    sudo=sudo
-    root_user=ubuntu
-  fi
-
-  true
+  cat $PairUp/reconnect
 }
 
 # cd to the pairup repo directory:
-setup() {
+assert-env() {
+  # Check for needed system commands:
+  for dep in git rsync ssh; do
+    if ! type $dep &>/dev/null; then
+      die "Missing dependency '$dep'"
+    fi
+  done
+
   # cd to the pairup repo:
   pairup_bin="$0"
   [[ "$pairup_bin" =~ ^bin/[A-Za-z0-9_-]+$ ]] &&
@@ -145,63 +125,139 @@ setup() {
     die "Can't find remote"
   [[ "$pairup_repo" =~ github\.com ]] ||
     die "'$pairup_repo' is bad repo name"
-  :
+
+}
+
+# Parse command line args:
+get-opts() {
+  [ $# -eq 0 ] && set -- --help
+
+  eval "$(
+    echo "$GETOPT_SPEC" |
+    git rev-parse --parseopt -- "$@" ||
+      echo "exit $?"
+  )"
+
+  project_list=()
+  root_user=root
+  quiet_output=false
+  verbose_output=false
+  admin_user="$USER"
+
+  while [ $# -gt 0 ]; do
+    local option="$1"; shift
+    case "$option" in
+      -a) admin_user="$1"; shift ;;
+      -p) project_list+=("$1") ;;
+      -A) die "AWS not tested yet" ;;
+      -D) ;;
+      -H)
+        sudo=sudo
+        root_user=ubuntu
+        ;;
+      -L) ;;
+      -R) ;;
+
+      -B) PAIRUP_BUILD_ONLY=1 ;;
+
+      -q) quiet_output=true ;;
+      -v) verbose_output=true ;;
+
+      --) break ;;
+
+      *) error "unexpected option '$option'" ;;
+    esac
+  done
+
+  vm_address="${1:?Server Address Required}"; shift
+  [[ "$vm_address" =~ \. ]] ||
+    die "Invalid Server Address: '$vm_address'"
+  pair_users=("$@")
+
+  # Detect HPCS:
+  if [[ "$vm_address" =~ ^15\.125\. ]]; then
+    sudo=sudo
+    root_user=ubuntu
+  fi
 }
 
 # Copy everything the server will need into $PairUp/ and make sure both users
 # have a public key:
 build-config() {
-  # Copy over default and user files:
-  rm -fr $PairUp
-  cp -r conf $PairUp
-  cp -r bin $PairUp/
-  mkdir -p $PairUp/user
-  cp user/github-users* $PairUp/user/
+  [ ! -d "$PairUp" ] || rm -fr $PairUp
+  mkdir -p $PairUp
 
+  cat <<... > $PairUp/pairup-env
+export PAIRUP_ROOT=~/.PairUp
+export PAIRUP=true
+export PAIRUP_ADMIN="$admin_user"
+export PAIRUP_ROOT_USER="$root_user"
+export PAIRUP_PAIRS=(${pair_users[@]})
+export PAIRUP_VMADDR="$vm_address"
+export PAIRUP_STARTED="$(date)"
+export PAIRUP_REPO="$pairup_repo"
+...
+
+cat <<... > $PairUp/reconnect
+
+Connect to PairUp with:
+
+    ssh -t "${admin_user%:*}@$vm_address" pairup
+
+...
+
+cat <<... > $PairUp/motd
+
+Welcome to your new PairUp server tmux session!
+
+Tell $pair_users to run this command:
+
+    ssh -t $pair_users@$vm_address pairup
+
+-------------------------------------------------------------------------------
+...
+
+  cp -r bin $PairUp/
+  cp -r lib $PairUp/
+  mkdir $PairUp/user
+  mkdir $PairUp/keys
+  for f in conf/*; do
+    if [[ ! "$f" =~ /\. ]] && [ -f "$f" ]; then
+      cp "$f" $PairUp/
+    fi
+  done
 
   # Take the default conf files and append the appropriate user conf files to
   # each one:
-  for user in "$admin_user" "$pair_user" private; do
-    for file in conf... cpan debian github install known_hosts ssh-config; do
-      if [ -e "user/$user/$file" ]; then
-        [ "$file" != known_hosts ] &&
-          echo -e "\n# $user settings:" >> "$PairUp/$file"
-        cat "user/$user/$file" >> "$PairUp/$file"
-      fi
-    done
-    [ "$user" == private ] && continue
-    mkdir -p "$PairUp/user/$user"
-    [[ -d "user/$user" ]] && [[ -n "$(ls -A "user/$user")" ]] &&
-      cp -r user/"$user"/* "$PairUp/user/$user/"
+  for user in "$admin_user" "${pair_users[@]}"; do
+    local unix_user="${user%:*}"
+    mkdir "$PairUp/keys/$unix_user"
+    if [ -f "conf/user/$unix_user" ]; then
+      cp "conf/user/$unix_user" "$PairUp/user/$unix_user"
+    fi
     assert-public-key
   done
 
-  # Render the templates into $PairUp/
-  for t in template/*; do
-    text=$(< "$t")
-    text=${text//%%root_user%%/$root_user}
-    text=${text//%%admin_user%%/$admin_user}
-    text=${text//%%pair_user%%/$pair_user}
-    text=${text//%%pairup_repo%%/$pairup_repo}
-    text=${text//%%ip_address%%/$ip_address}
-    text=${text//%%time_of_day%%/$(date)}
-    echo "$text" > "$PairUp/${t##*/}"
-  done
+  cp -p share/bin/root-setup $PairUp/
+  cp -p share/bin/admin-setup $PairUp/
 }
 
-# Use the rsa public key under ./user/$user/authorized_keys or attempt to get one
-# from GitHub, or error out:
+# Use the rsa public key under ./user/$unix_user/authorized_keys or attempt to
+# get one from GitHub, or error out:
 assert-public-key() {
-  if [ -e "$PairUp/user/$user/authorized_keys" ] ||
-     [ -e "$PairUp/user/$user/authorized_keys2" ]; then
-      return
+  local unix_user= github_user=
+  if [[ "$user" =~ : ]]; then
+    unix_user="${user%:*}"
+    github_user="${user#*:}"
+  else
+    unix_user="$user"
   fi
   if [ -z "$github_user" ]; then
-    local github_user="$(
-      grep -Esh "^$user:" $PairUp/user/github-users* |
+    github_user="$(
+      grep -Esh "^$unix_user:" $PairUp/github-users* |
       head -n1 | cut -d: -f2
     )"
-    github_user="${github_user:-$user}"
+    github_user="${github_user:-$unix_user}"
   fi
   local keys=$(
     curl --silent "https://api.github.com/users/$github_user/keys"
@@ -217,16 +273,18 @@ assert-public-key() {
     cut -d'"' -f4
   )
   if [ -n "$rsa_keys" ]; then
-    echo "$rsa_keys" > "$PairUp/user/$user/authorized_keys"
+    echo "$rsa_keys" > "$PairUp/keys/$unix_user/authorized_keys"
   fi
   if [ -n "$dsa_keys" ]; then
-    echo "$dsa_keys" > "$PairUp/user/$user/authorized_keys2"
+    echo "$dsa_keys" > "$PairUp/keys/$unix_user/authorized_keys2"
   fi
-  [ -s "$PairUp/user/$user/authorized_keys" ] ||
-  [ -s "$PairUp/user/$user/authorized_keys2" ] ||
-    die "Can't find a public key for user '$user:$github_user'"
+  [ -s "$PairUp/keys/$unix_user/authorized_keys" ] ||
+  [ -s "$PairUp/keys/$unix_user/authorized_keys2" ] ||
+    die "Can't find a public key for user '$unix_user:$github_user'"
   :
 }
 
 # Start the PairUp server setup:
-[ "$0" == "${BASH_SOURCE[0]}" ] && main "$@";:
+[ "$0" != "$BASH_SOURCE" ] || main "$@"
+
+# vim: set lisp:

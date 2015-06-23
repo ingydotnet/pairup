@@ -5,8 +5,8 @@ Fast, Custom, Throwaway Pair Programming VPS
 
 = Synopsis
 
-Create a debian-based VPS somewhere (DigitalOcean/RackSpace/HPCloud/AWS). Note
-the ip_address and (on RackSpace at least) root password.
+Create a debian-based VPS somewhere (AWS, DigitalOcean, etc). Note
+the server address and (on RackSpace at least) root password.
 
 Then run:
 

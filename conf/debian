@@ -3,6 +3,7 @@ exuberant-ctags
 htop
 libncurses-dev
 libtool
+perl-doc
 pkg-config
 tig
 tmux

@@ -26,17 +26,18 @@ while read -r bash; do
 done <<...
 bin/pairup
 bin/pairup-add-user
+bin/pairup-create-hp
 bin/pairup-del-user
-bin/pairup-helper-functions
 bin/pairup-info
 bin/pairup-install-cpan
 bin/pairup-install-repos
 bin/pairup-install-software
 bin/pairup-invite-user
 bin/pairup-server-setup
-bin/pairup-server-new-hp
-template/admin-setup
-template/root-setup
+lib/bashmore.bash
+lib/pairup-util.bash
+share/bin/admin-setup
+share/bin/root-setup
 ...
 
 echo "1..$i"

@@ -9,11 +9,11 @@ main() {
 PairUp Server Info:
 
   Server Created:    $PAIRUP_STARTED
-  IP Address:        $PAIRUP_IPADDR
+  VM Address:        $PAIRUP_VMADDR
   Admin User:        $PAIRUP_ADMIN
   Pair User:         $PAIRUP_PAIR
 
 ...
 }
 
-[ "$0" == "${BASH_SOURCE[0]}" ] && main "$@";:
+[ "$0" != "$BASH_SOURCE" ] || main "$@"
