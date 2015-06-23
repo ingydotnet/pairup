@@ -196,6 +196,9 @@ export PAIRUP_PAIRS=(${pair_users[@]})
 export PAIRUP_VMADDR="$vm_address"
 export PAIRUP_STARTED="$(date)"
 export PAIRUP_REPO="$pairup_repo"
+export PATH="\
+\$PAIRUP_ROOT/bin:\
+\$PATH"
 ...
 
 cat <<... > $PairUp/reconnect

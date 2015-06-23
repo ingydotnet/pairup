@@ -11,21 +11,20 @@ main() {
   mkdir -p ~/.sh
   cp $PAIRUP_ROOT/pairup-env ~/.sh/
 
-
   SECTION "Copy known_hosts and config to .ssh/:"
   cp $PAIRUP_ROOT/known_hosts .ssh/known_hosts
   cp $PAIRUP_ROOT/ssh-config .ssh/config
 
   SECTION "Install ... dotfile management setup:"
   git clone git@github.com:sharpsaw/....git || continue?
-  mv $PAIRUP_ROOT/conf... .../conf
+  cp $PAIRUP_ROOT/conf... .../conf
   .../... update || continue?
   .../... install || continue?
 
-  SECTION "sudo pairup-install-software"
+  SECTION "sudo $PairUp/bin/pairup-install-software"
   log="$PAIRUP_ROOT/install.log" run-section-cmd
 
-  SECTION "sudo pairup-install-cpan"
+  SECTION "sudo $PairUp/bin/pairup-install-cpan"
   log="$PAIRUP_ROOT/cpan.log" run-section-cmd
 
   SECTION "pairup-install-repos"

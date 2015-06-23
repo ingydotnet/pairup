@@ -4,7 +4,7 @@
 
 set -e
 
-source "${BASH_SOURCE%/*}/pairup-helper-functions"
+source "${BASH_SOURCE%/*}/../lib/pairup-util.bash"
 
 main() {
   pair_user="${1:?userid required}"; shift

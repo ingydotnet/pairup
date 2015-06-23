@@ -10,12 +10,14 @@ carp() {
     set +x
     cat <<... >&2
 ${1:-$section_command} failed (status: $?):
+PATH=$PATH
 SSH_AUTH_SOCK=$SSH_AUTH_SOCK
 user: `whoami`
 cwd: `pwd`
-~/.ssh/known_hosts:
 ...
-    cat ~/.ssh/known_hosts >&2
+# ~/.ssh/known_hosts:
+# ...
+#     cat ~/.ssh/known_hosts >&2
   )
   true
 }

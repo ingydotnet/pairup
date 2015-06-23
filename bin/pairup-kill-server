@@ -4,7 +4,7 @@
 
 set -ex
 
-source "${BASH_SOURCE%/*}/pairup-helper-functions"
+source "${BASH_SOURCE%/*}/../lib/pairup-util.bash"
 
 echo "$0 not implemented yet" >&2
 

@@ -4,9 +4,9 @@
 # - http://www.tofu.org/drupal/node/183
 # - http://robots.thoughtbot.com/a-tmux-crash-course
 
-# set -x
+set -e
 
-source "${BASH_SOURCE%/*}/pairup-helper-functions"
+source "${BASH_SOURCE%/*}/../lib/pairup-util.bash"
 
 main() {
   check_cmd "$@"
@@ -32,7 +32,8 @@ main() {
   \
   ';' select-window -t :1 \
   ';' rename-window "PairUp^" \
-  ';' send-keys "clear; cat $motd; echo; cat /etc/motd; echo" C-m \
+  ';' send-keys "clear; cat $motd; echo; " \
+  ';' send-keys "[ -e /etc/motd ] && cat /etc/motd && echo" C-m \
   ';' split-window -h -p 33 \
   ';' send-keys "weechat-curses" C-m \
   ';' select-pane -L \
