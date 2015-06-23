@@ -221,24 +221,41 @@ Tell $pair_users to run this command:
 --------------------------------------------------------------------------------
 ...
 
+  mkdir $PairUp/conf
+  mkdir $PairUp/user
+  mkdir $PairUp/project
+  mkdir $PairUp/keys
+
   cp -p share/script/root-setup $PairUp/
   cp -p share/script/admin-setup $PairUp/
   cp -pr share/bin $PairUp/sbin
   cp -pr bin $PairUp/bin
   cp -pr lib $PairUp/lib
-  cp -pr conf $PairUp/conf
-  rm -fr $PairUp/conf/{.gitignore,private,project,server,user}
-  mkdir $PairUp/user
-  mkdir $PairUp/keys
+  cp -pr conf/github-users $PairUp/conf/
+  cp -pr conf/base/* $PairUp/conf/
+
+  chmod +x $PairUp/conf/install
 
   # Take the default conf files and append the appropriate user conf files to
   # each one:
   for user in "$admin_user" "${pair_users[@]}"; do
     local unix_user="${user%:*}"
     mkdir "$PairUp/keys/$unix_user"
-    if [ -f "conf/user/$unix_user" ]; then
-      cp "conf/user/$unix_user" "$PairUp/user/$unix_user"
-    fi
+
+    for file in conf... cpan debian github install known_hosts ssh-config; do
+      if [ -e "conf/user/$unix_user/$file" ]; then
+        if [ "$file" != known_hosts ]; then
+          echo -e "\n# User settings for '$unix_user':" >> "$PairUp/conf/$file"
+        fi
+        cat "conf/user/$unix_user/$file" >> "$PairUp/conf/$file"
+      fi
+    done
+
+    mkdir "$PairUp/user/$unix_user"
+    [[ -d "conf/user/$unix_user" ]] &&
+      [[ -n "$(ls -A "conf/user/$unix_user")" ]] &&
+      cp -r conf/user/"$unix_user"/* "$PairUp/user/$unix_user/"
+
     assert-public-key
   done
 }
@@ -278,6 +295,14 @@ assert-public-key() {
   fi
   if [ -n "$dsa_keys" ]; then
     echo "$dsa_keys" > "$PairUp/keys/$unix_user/authorized_keys2"
+  fi
+  if [ -e "$PairUp/user/$unix_user/authorized_keys" ]; then
+    cat "$PairUp/user/$unix_user/authorized_keys" >> \
+      "$PairUp/keys/$unix_user/authorized_keys"
+  fi
+  if [ -e "$PairUp/user/$unix_user/authorized_keys2" ]; then
+    cat "$PairUp/user/$unix_user/authorized_keys2" >> \
+      "$PairUp/keys/$unix_user/authorized_keys2"
   fi
   [ -s "$PairUp/keys/$unix_user/authorized_keys" ] ||
   [ -s "$PairUp/keys/$unix_user/authorized_keys2" ] ||

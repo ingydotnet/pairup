@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -e
+
+source "${PAIRUP_ROOT:??}/lib/pairup.bash"
+
+set -x
+
+TITLE "Custom install script:"
+
+(
+  while [ ! -e /usr/bin/ack-grep ]; do
+    sleep 5
+  done
+  sudo ln -fs /usr/bin/ack-grep /usr/local/bin/ack
+) &
+
+#------------------------------------------------------------------------------

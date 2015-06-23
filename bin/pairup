@@ -13,9 +13,10 @@ main() {
 
   tmux_sock=/tmp/pairup
   motd=$PairUp/motd
-  debian_log_file=$PairUp/debian.log
-  github_log_file=$PairUp/github.log
-  cpan_log_file=$PairUp/cpan.log
+  debian_log_file=$PairUp/log/debian.log
+  github_log_file=$PairUp/log/github.log
+  cpan_log_file=$PairUp/log/cpan.log
+  install_log_file=$PairUp/log/install.log
 
   tmux -S $tmux_sock attach || tmux -S $tmux_sock new \
   \
@@ -28,6 +29,8 @@ main() {
   ';' send-keys "tail -f $github_log_file" C-m \
   ';' split-window -h \
   ';' send-keys "tail -f $cpan_log_file" C-m \
+  ';' split-window -h \
+  ';' send-keys "tail -f $install_log_file" C-m \
   ';' select-layout even-horizontal \
   \
   ';' select-window -t :1 \

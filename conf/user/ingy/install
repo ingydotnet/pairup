@@ -1,0 +1,10 @@
+
+touch ~/FOOOOOOOOOOOOOOOOOOOOO
+
+# - Install plenv and build perls
+# - Install modules under main plenv version
+# - Install and fix Devel::Local
+
+# local-lang plenv-install
+# local-lang rbenv-install
+# local-lang nvm-install

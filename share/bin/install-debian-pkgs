@@ -24,10 +24,7 @@ main() {
     apt-get install $pkg --yes
   done
 
-  TITLE "Run custom installer '$PairUp/install'"
-  source $PAIRUP_ROOT/install
-
-  TITLE "DONE! pairup-install-software is complete."
+  TITLE "DONE! install-debian-pkgs is complete."
 }
 
 [ "$0" != "$BASH_SOURCE" ] || main "$@"

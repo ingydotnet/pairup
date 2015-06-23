@@ -18,6 +18,8 @@ main() {
   for repo in $repos; do
     (git clone "git@github.com:$repo" "src/${repo#*/}") || true
   done
+
+  TITLE "DONE! clone-github-repos is complete."
 }
 
 [ "$0" != "$BASH_SOURCE" ] || main "$@"

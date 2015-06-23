@@ -31,7 +31,7 @@ main() {
     cpanm -n -f $module || true
   done
 
-  TITLE "DONE! pairup-install-cpan is complete."
+  TITLE "DONE! install-cpan-modules is complete."
 }
 
 [ "$0" != "$BASH_SOURCE" ] || main "$@"

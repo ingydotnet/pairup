@@ -1,4 +1,5 @@
 # Basic essential debian pkgs:
+ack-grep
 exuberant-ctags
 htop
 libncurses-dev
