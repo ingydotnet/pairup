@@ -1,19 +1,19 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# See:
+# Setup a complex tmux environment for PairUpi. See:
 # - http://www.tofu.org/drupal/node/183
 # - http://robots.thoughtbot.com/a-tmux-crash-course
 
 set -e
 
-source "${BASH_SOURCE%/*}/../lib/pairup-util.bash"
+source "${PAIRUP_ROOT:??}/lib/pairup.bash"
 
 main() {
   check_cmd "$@"
 
   tmux_sock=/tmp/pairup
   motd=$PairUp/motd
-  install_log_file=$PairUp/install.log
+  debian_log_file=$PairUp/debian.log
   github_log_file=$PairUp/github.log
   cpan_log_file=$PairUp/cpan.log
 
@@ -23,7 +23,7 @@ main() {
   \
   ';' new-window -t :2 -n "Tail Logs" \
   ';' send-keys "chmod 777 $tmux_sock" C-m \
-  ';' send-keys "tail -f $install_log_file" C-m \
+  ';' send-keys "tail -f $debian_log_file" C-m \
   ';' split-window -h \
   ';' send-keys "tail -f $github_log_file" C-m \
   ';' split-window -h \

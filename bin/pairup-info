@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
-source "${BASH_SOURCE%/*}/../lib/pairup-util.bash"
+source "${PAIRUP_ROOT:??}/lib/pairup.bash"
 
 main() {
   cat <<...

@@ -1,13 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-die() { echo "$1" >&2; exit 42; }
+# die() { echo "$1" >&2; exit 1; }
+
+PAIRUP_ROOT="$PWD"
+PAIRUP_TEST_RUN=1
 
 ok=0
-while read -r bash; do
-  (
-    PairUp=./
-    PATH="./bin:$PATH" source "$bash"
-  ) && rc=true || rc=false
+for bash in bin/* lib/* share/bin/* share/script/*; do
+  (source "$bash") && rc=true || rc=false
   if $rc; then
     echo "ok $((++i)) - source $bash"
   else
@@ -23,22 +23,7 @@ while read -r bash; do
       ok=1
     fi
   fi
-done <<...
-bin/pairup
-bin/pairup-add-user
-bin/pairup-create-hp
-bin/pairup-del-user
-bin/pairup-info
-bin/pairup-install-cpan
-bin/pairup-install-repos
-bin/pairup-install-software
-bin/pairup-invite-user
-bin/pairup-server-setup
-lib/bashmore.bash
-lib/pairup-util.bash
-share/bin/admin-setup
-share/bin/root-setup
-...
+done
 
 echo "1..$i"
 

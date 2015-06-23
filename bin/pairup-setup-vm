@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #------------------------------------------------------------------------------
 # Setup a Debian-based VPS for remote pair hacking.
@@ -37,7 +37,8 @@ R,rackspace     Remote VM is on Rackspace
 B,build-only    Just build the PairUp directory
 "
 
-source "${BASH_SOURCE%/*}/../lib/pairup-util.bash"
+export PAIRUP_ROOT="${PAIRUP_ROOT:-${BASH_SOURCE%/*}/..}"
+source "$PAIRUP_ROOT/lib/pairup.bash"
 
 # main() is called at bottom of this file:
 main() {
@@ -217,18 +218,18 @@ Tell $pair_users to run this command:
 
     ssh -t $pair_users@$vm_address pairup
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 ...
 
-  cp -r bin $PairUp/
-  cp -r lib $PairUp/
+  cp -p share/script/root-setup $PairUp/
+  cp -p share/script/admin-setup $PairUp/
+  cp -pr share/bin $PairUp/sbin
+  cp -pr bin $PairUp/bin
+  cp -pr lib $PairUp/lib
+  cp -pr conf $PairUp/conf
+  rm -fr $PairUp/conf/{.gitignore,private,project,server,user}
   mkdir $PairUp/user
   mkdir $PairUp/keys
-  for f in conf/*; do
-    if [[ ! "$f" =~ /\. ]] && [ -f "$f" ]; then
-      cp "$f" $PairUp/
-    fi
-  done
 
   # Take the default conf files and append the appropriate user conf files to
   # each one:
@@ -240,9 +241,6 @@ Tell $pair_users to run this command:
     fi
     assert-public-key
   done
-
-  cp -p share/bin/root-setup $PairUp/
-  cp -p share/bin/admin-setup $PairUp/
 }
 
 # Use the rsa public key under ./user/$unix_user/authorized_keys or attempt to
@@ -257,7 +255,7 @@ assert-public-key() {
   fi
   if [ -z "$github_user" ]; then
     github_user="$(
-      grep -Esh "^$unix_user:" $PairUp/github-users* |
+      grep -Esh "^$unix_user:" $PairUp/conf/github-users* |
       head -n1 | cut -d: -f2
     )"
     github_user="${github_user:-$unix_user}"

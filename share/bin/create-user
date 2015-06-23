@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+set -e
+
+source "$PAIRUP_ROOT/lib/pairup.bash"
+
+main() {
+  local user="${1:?user required}"
+  local admin="${2:-false}"
+
+  user="${user%:*}"
+
+  # Don't addgroup for HPCloud
+  if $admin && [ "${PAIRUP_ROOT_USER:??}" == root ]; then
+    addgroup admin || continue?
+  fi
+
+  adduser --disabled-password --gecos '' $user || continue?
+  if $admin; then
+    adduser $user admin || continue?
+  fi
+
+  mkdir -p /home/$user/.ssh
+  chmod 700 /home/$user/.ssh
+  cp $PairUp/keys/$user/authorized_keys* /home/$user/.ssh/
+  if $admin; then
+    chown -R $user:admin /home/$user/.ssh
+    cp -r $PairUp /home/$user/
+    chown -R $user:admin /home/$user/$PairUp
+    echo "$user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+  else
+    chown -R $user:$user /home/$user/.ssh
+  fi
+}
+
+[ "$0" != "$BASH_SOURCE" ] || main "$@"

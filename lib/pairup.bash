@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 export PairUp=.PairUp
 
@@ -30,23 +30,34 @@ continue?() {
   )
 }
 
-SECTION() {
-  section_command="$1"
+RUN() {
+  local sbin="${PAIRUP_ROOT:??}/sbin"
+  local command="${1:?command required}"; shift
+  [ -z "$title" ] || TITLE "$title"
+  "$sbin/$command" "$@"
+}
+
+TITLE() {
   (
     set +x
     cat <<...
 ###############################################################################
-# $section_command
+# $1
 ###############################################################################
 ...
   )
 }
 
-run-section-cmd() {
-  [ -n "$log" ] ||
-    die "Missing 'log' running section command '$section_command'"
-  $section_command &>> $log || carp &>> $log &
-}
+# SECTION() {
+#   section_command="$1"
+#   TITLE "$1"
+# }
+# 
+# run-section-cmd() {
+#   [ -n "$log" ] ||
+#     die "Missing 'log' running section command '$section_command'"
+#   $section_command &>> $log || carp &>> $log &
+# }
 
 tests_ok() {
   local path="$BASH_SOURCE"
@@ -62,6 +73,8 @@ tests_ok() {
 export -f carp
 export -f continue?
 export -f die
-export -f SECTION
-export -f run-section-cmd
+export -f RUN
+export -f TITLE
+# export -f SECTION
+# export -f run-section-cmd
 export -f tests_ok

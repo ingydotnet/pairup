@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+set -e
+
+source "${PAIRUP_ROOT:??}/lib/pairup.bash"
+
+main() {
+  set -x
+
+  local pkgs=
+
+  pkgs="$(
+    cat $PAIRUP_ROOT/conf/debian |
+      grep -Ev '\#' |
+      grep -Ev '^$' |
+      sort | uniq
+    true
+  )"
+
+  TITLE "Installing these Debian packages:"
+  echo "$pkgs"
+
+  for pkg in $pkgs; do
+    apt-get install $pkg --yes
+  done
+
+  TITLE "Run custom installer '$PairUp/install'"
+  source $PAIRUP_ROOT/install
+
+  TITLE "DONE! pairup-install-software is complete."
+}
+
+[ "$0" != "$BASH_SOURCE" ] || main "$@"

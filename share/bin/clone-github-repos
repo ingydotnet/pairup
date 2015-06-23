@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -e
+
+source "${PAIRUP_ROOT:??}/lib/pairup.bash"
+
+main() {
+  set -x
+
+  repos="$(
+    cat "$PAIRUP_ROOT/conf/github" |
+      grep -Ev '\#' |
+      grep -Ev '^$' |
+      sort | uniq
+  )"
+
+  TITLE "Clone GitHub repos:"
+  for repo in $repos; do
+    (git clone "git@github.com:$repo" "src/${repo#*/}") || true
+  done
+}
+
+[ "$0" != "$BASH_SOURCE" ] || main "$@"

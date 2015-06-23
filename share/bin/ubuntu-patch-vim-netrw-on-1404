@@ -1,16 +1,21 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
-# This patch is only for Ubuntu 14.04
-[ -e /etc/lsb-release ] || exit 0
-source /etc/lsb-release
-[ "$DISTRIB_RELEASE" == '14.04' ] || exit 0
+source "$PAIRUP_ROOT/lib/pairup.bash"
 
-target=${1:-/usr/share/vim/vim74/autoload/netrw.vim}
-cp "$target" "$target-$(date +'%s')"
+main() {
+  # This patch is only for Ubuntu 14.04
+  [ -e /etc/lsb-release ] || exit 0
+  source /etc/lsb-release
+  [ "$DISTRIB_RELEASE" == '14.04' ] || exit 0
 
-patch --force --reject-file=- $target <<'...' || true
+  target=${1:-/usr/share/vim/vim74/autoload/netrw.vim}
+  cp "$target" "$target-$(date +'%s')"
+
+  TITLE "Patch vim netrw script on Ubuntu 14.04"
+
+  patch --force --reject-file=- $target <<'...' || true
 --- a
 +++ b
 @@ -4393,7 +4393,10 @@
@@ -26,3 +31,6 @@ patch --force --reject-file=- $target <<'...' || true
      else
  "     call Decho("(NetrwBrowseChgDir:edit-a-file) remote file: NetrwBrowse will edit it")
 ...
+}
+
+[ "$0" != "$BASH_SOURCE" ] || main "$@"

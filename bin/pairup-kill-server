@@ -1,11 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Delete a new rackspace server instance
 
-set -ex
+set -e
 
-source "${BASH_SOURCE%/*}/../lib/pairup-util.bash"
+source "${PAIRUP_ROOT:??}/lib/pairup.bash"
 
-echo "$0 not implemented yet" >&2
+main() {
+  echo "$0 not implemented yet" >&2
+  exit 1
+}
 
-exit 1
+[ "$0" != "$BASH_SOURCE" ] || main "$@"

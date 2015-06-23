@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+set -e
+
+[ -n "$PAIRUP_TEST_RUN" ] ||
+  source ${PAIRUP_ROOT:=.PairUp}/pairup-env
+source $PAIRUP_ROOT/lib/pairup.bash
+
+main() {
+  local sudo= title= log= user=
+
+  set -x
+
+  TITLE "Root user setup:"
+
+  admin_user="${PAIRUP_ADMIN%:*}"
+  title="Create admin user: '$admin_user'" \
+    RUN create-user "$admin_user" true
+
+  for user in "${PAIRUP_PAIRS[@]}"; do
+    title="Create pair user: '$user'" \
+      RUN create-user "$user"
+  done
+
+  TITLE "Copy known hosts to .ssh/:"
+  cp "$PAIRUP_ROOT/conf/known_hosts" .ssh/known_hosts
+
+  title="Install bootstrapping Debian packages:" \
+    RUN bootstrap-debian
+
+  RUN ubuntu-patch-vim-netrw-on-1404
+
+  title="Install system cpanm:" \
+    RUN perl-install-cpanm
+
+  TITLE "DONE! root-setup is complete."
+}
+
+[ "$0" != "$BASH_SOURCE" ] || main "$@"

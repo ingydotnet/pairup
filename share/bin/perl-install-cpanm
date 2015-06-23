@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -e
+
+source "$PAIRUP_ROOT/lib/pairup.bash"
+
+main() {
+  curl -L http://cpanmin.us | perl - App::cpanminus || continue?
+}
+
+[ "$0" != "$BASH_SOURCE" ] || main "$@"

@@ -1,37 +1,37 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
-source "${BASH_SOURCE%/*}/../lib/pairup-util.bash"
+source "${PAIRUP_ROOT:??}/lib/pairup.bash"
 
 main() {
   set -x
 
-  SECTION "CPAN Installer:"
+  TITLE "CPAN Installer:"
 
   local modules= massive=
 
   # apt-get install requested packages:
   modules="$(
-    cat $PairUp/cpan |
+    cat $PAIRUP_ROOT/conf/cpan |
       grep -Ev '\#' |
       grep -Ev '^$' |
       sort | uniq
   )"
-  massive="$(echo "$modules" | grep -E '^Dist::')"
-  modules="$(echo "$modules" | grep -Ev '^Dist::')"
+  massive="$(echo "$modules" | grep -E '^Dist::' || true)"
+  modules="$(echo "$modules" | grep -Ev '^Dist::' || true)"
 
-  SECTION "List of CPAN modules to install:"
+  TITLE "List of CPAN modules to install:"
   echo "Installing these CPAN modules:"
   echo "$modules"
   echo "$massive"
 
-  SECTION "Install requested CPAN modules:"
+  TITLE "Install requested CPAN modules:"
   for module in $modules $massive; do
     cpanm -n -f $module || true
   done
 
-  SECTION "DONE! pairup-install-cpan is complete."
+  TITLE "DONE! pairup-install-cpan is complete."
 }
 
 [ "$0" != "$BASH_SOURCE" ] || main "$@"

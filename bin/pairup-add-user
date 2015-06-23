@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Usage: add-pair-user <user-id> [<github-user-id>]
 
 set -e
 
-source "${BASH_SOURCE%/*}/../lib/pairup-util.bash"
+source "${PAIRUP_ROOT:??}/lib/pairup.bash"
 
 main() {
   pair_user="${1:?userid required}"

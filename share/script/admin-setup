@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -e
+
+[ -n "$PAIRUP_TEST_RUN" ] ||
+  source ${PAIRUP_ROOT:=.PairUp}/pairup-env
+source $PAIRUP_ROOT/lib/pairup.bash
+
+main() {
+  local sudo= title= log= user=
+
+  set -x
+  TITLE "Admin user setup:"
+  mkdir -p ~/.sh
+  cp $PAIRUP_ROOT/pairup-env ~/.sh/
+
+  TITLE "Copy known_hosts and config to .ssh/:"
+  cp $PAIRUP_ROOT/conf/known_hosts .ssh/known_hosts
+  cp $PAIRUP_ROOT/conf/ssh-config .ssh/config
+
+  TITLE "Install ... dotfile management setup:"
+  git clone git@github.com:sharpsaw/....git || continue?
+  cp $PAIRUP_ROOT/conf/conf... .../conf
+  .../... update || continue?
+  .../... install || continue?
+
+  title="Clone common GitHub repos:" \
+  log="$PAIRUP_ROOT/github.log" \
+    RUN clone-github-repos
+
+  title="Install command CPAN modules:" \
+  log="$PAIRUP_ROOT/cpan.log" \
+    RUN install-cpan-modules
+
+  title="Install command Debian packages:" \
+  log="$PAIRUP_ROOT/debian.log" \
+    RUN install-debian-pkgs
+
+  TITLE "Start the PairUp custom tmux setup:"
+  bash -l "$PAIRUP_ROOT/bin/pairup" || true
+}
+
+[ "$0" != "$BASH_SOURCE" ] || main "$@"
