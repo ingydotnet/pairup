@@ -5,17 +5,19 @@ set -e
 export PairUp=.PairUp
 
 RUN() {
-  if [ -z "$cmd" ]; then
-    local cmd="${PAIRUP_ROOT:??}/sbin/${1:?command required}"
+  local Cmd="$cmd" Title="$title" Sudo="$sudo" Log="$log"
+  cmd= title= sudo= log=
+  if [ -z "$Cmd" ]; then
+    Cmd="${PAIRUP_ROOT:??}/sbin/${1:?command required}"
     shift
   fi
-  [ -z "$title" ] || TITLE "$title"
-  [ -z "$sudo" ] || local sudo='sudo -E'
-  if [ -n "$log" ]; then
-    mkdir -p "$(dirname $log)"
-    $sudo "$cmd" "$@" &>> "$log"
+  [ -z "$Title" ] || TITLE "$Title"
+  [ -z "$Sudo" ] || local Sudo='sudo -E'
+  if [ -n "$Log" ]; then
+    mkdir -p "$(dirname $Log)"
+    $Sudo "$Cmd" "$@" &>> "$Log"
   else
-    $sudo "$cmd" "$@"
+    $Sudo "$Cmd" "$@"
   fi
 }
 

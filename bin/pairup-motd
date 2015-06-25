@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -e
+
+source "${PAIRUP_ROOT:??}/lib/pairup.bash"
+
+main() {
+  clear
+  if [ -e $PAIRUP_ROOT/motd ]; then
+    cat $PAIRUP_ROOT/motd
+    echo
+  fi
+  if [ -e /etc/motd ]; then
+    cat /etc/motd
+    echo
+  fi
+}
+
+[ "$0" != "$BASH_SOURCE" ] || main "$@"

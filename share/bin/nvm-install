@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -ex
+
+(
+  source ~/.nvm/nvm.sh
+  nvm install ${1:?Node version required}
+)
+
+echo "$1" > ~/.nvmrc

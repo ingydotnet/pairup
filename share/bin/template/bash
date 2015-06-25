@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -e
+
+source "$PAIRUP_ROOT/lib/pairup.bash"
+
+main() {
+  true  # Code goes here
+}
+
+[ "$0" != "$BASH_SOURCE" ] || main "$@"

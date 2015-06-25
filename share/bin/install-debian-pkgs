@@ -1,30 +1,22 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
 source "${PAIRUP_ROOT:??}/lib/pairup.bash"
 
-main() {
-  set -x
+pkgs="$(
+  cat $PAIRUP_ROOT/conf/debian |
+    grep -Ev '\#' |
+    grep -Ev '^$' |
+    sort | uniq
+  true
+)"
 
-  local pkgs=
+TITLE "Installing these Debian packages:"
+echo "$pkgs"
 
-  pkgs="$(
-    cat $PAIRUP_ROOT/conf/debian |
-      grep -Ev '\#' |
-      grep -Ev '^$' |
-      sort | uniq
-    true
-  )"
+for pkg in $pkgs; do
+  apt-get install $pkg --yes
+done
 
-  TITLE "Installing these Debian packages:"
-  echo "$pkgs"
-
-  for pkg in $pkgs; do
-    apt-get install $pkg --yes
-  done
-
-  TITLE "DONE! install-debian-pkgs is complete."
-}
-
-[ "$0" != "$BASH_SOURCE" ] || main "$@"
+TITLE "DONE! install-debian-pkgs is complete."

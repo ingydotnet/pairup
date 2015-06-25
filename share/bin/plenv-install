@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -ex
+
+(
+  . ~/.sh/plenv-init
+  plenv install ${1:?Perl version required}
+  plenv global $1
+)

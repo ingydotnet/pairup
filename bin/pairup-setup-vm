@@ -46,6 +46,7 @@ main() {
   local root_user= sudo=
   local vm_address= admin_user= pair_users=
   local quiet_output= verbose_output=
+  local ssh=ssh
 
   # Make sure our runtime environment is ok:
   assert-env
@@ -74,18 +75,18 @@ main() {
   # pubkey afterwards:
   if [ "$root_user" == root ]; then
     cat "$PairUp/keys/${admin_user%:*}/authorized_keys" |
-      ssh "$root_user@$vm_address" \
+      $ssh "$root_user@$vm_address" \
       "cat > ak; mkdir -p .ssh; chmod 700 .ssh; mv ak .ssh/authorized_keys"
   fi
 
   # Copy PairUp dir over to root:
-  rsync -avz $PairUp/ "$root_user@$vm_address:$PairUp"
+  rsync -az -e "$ssh" $PairUp/ "$root_user@$vm_address:$PairUp"
 
   # Run the interactive root script:
-  ssh -t "$root_user@$vm_address" $sudo bash "$PairUp/root-setup"
+  $ssh -t "$root_user@$vm_address" $sudo bash "$PairUp/root-setup"
 
   # Run the interactive admin_user script:
-  ssh -t "${admin_user%:*}@$vm_address" bash "$PairUp/admin-setup" \
+  $ssh -t "${admin_user%:*}@$vm_address" bash "$PairUp/admin-setup" \
     || true   # Show reconnect msg if the tmux fails
 
   # \oXo/
@@ -126,7 +127,6 @@ assert-env() {
     die "Can't find remote"
   [[ "$pairup_repo" =~ github\.com ]] ||
     die "'$pairup_repo' is bad repo name"
-
 }
 
 # Parse command line args:
@@ -179,6 +179,11 @@ get-opts() {
   if [[ "$vm_address" =~ ^15\.125\. ]]; then
     sudo=sudo
     root_user=ubuntu
+  fi
+
+  if [ -n "$PAIRUP_DEV" ]; then
+    local ssh_opts='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+    ssh="ssh $ssh_opts"
   fi
 }
 

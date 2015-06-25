@@ -22,21 +22,8 @@ main() {
   \
   ';' set-window-option -g automatic-rename off \
   \
-  ';' new-window -t :2 -n "Tail Logs" \
-  ';' send-keys "chmod 777 $tmux_sock" C-m \
-  ';' send-keys "tail -f $debian_log_file" C-m \
-  ';' split-window -h \
-  ';' send-keys "tail -f $github_log_file" C-m \
-  ';' split-window -h \
-  ';' send-keys "tail -f $cpan_log_file" C-m \
-  ';' split-window -h \
-  ';' send-keys "tail -f $install_log_file" C-m \
-  ';' select-layout even-horizontal \
-  \
-  ';' select-window -t :1 \
   ';' rename-window "PairUp^" \
-  ';' send-keys "clear; cat $motd; echo; " \
-  ';' send-keys "[ -e /etc/motd ] && cat /etc/motd && echo" C-m \
+  ';' send-keys "pairup-motd; " C-m \
   ';' split-window -h -p 33 \
   ';' send-keys "weechat-curses" C-m \
   ';' select-pane -L \

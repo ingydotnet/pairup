@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -e
+
+source "${PAIRUP_ROOT:??}/lib/pairup.bash"
+
+main() {
+  logs=( $( echo $PAIRUP_ROOT/log/* ) )
+  for (( i = 1; i < ${#logs[@]}; i++ )); do
+    tmux split-window "tail -f ${logs[$i]}"
+  done
+  tmux select-layout tile
+  tail -f "${logs[0]}"
+}
+
+[ "$0" != "$BASH_SOURCE" ] || main "$@"

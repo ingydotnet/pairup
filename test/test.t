@@ -6,7 +6,8 @@ PAIRUP_ROOT="$PWD"
 PAIRUP_TEST_RUN=1
 
 ok=0
-for bash in bin/* lib/* share/bin/* share/script/*; do
+for bash in bin/* lib/* share/script/*; do
+  [ -f "$bash" ] || continue
   (source "$bash") && rc=true || rc=false
   if $rc; then
     echo "ok $((++i)) - source $bash"

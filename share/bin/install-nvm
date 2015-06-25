@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -ex
+
+git clone https://github.com/creationix/nvm.git ~/.nvm &&
+  (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`)
+
+cat <<'...' > ~/.sh/nvm-init
+# https://github.com/creationix/nvm#manual-install
+. ~/.nvm/nvm.sh
+
+# https://github.com/creationix/nvm#bash-completion
+[[ -r $NVM_DIR/bash_completion ]] && . $NVM_DIR/bash_completion
+...

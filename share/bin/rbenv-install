@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -ex
+
+(
+  . ~/.sh/rbenv-init
+  rbenv install ${1:?Ruby version required}
+  rbenv global $1
+)

@@ -1,10 +1,26 @@
+TITLE "Install nvm and Node v0.10.24"
+RUN install-nvm
+RUN nvm-install stable
 
-touch ~/FOOOOOOOOOOOOOOOOOOOOO
+(
+  . ~/.sh/nvm-init
+  npm install -g coffee-script
+)
 
-# - Install plenv and build perls
-# - Install modules under main plenv version
-# - Install and fix Devel::Local
+TITLE "Install rbenv and Ruby 1.9.3-p545"
+RUN install-rbenv
+(
+  log=$PAIRUP_ROOT/log/ruby.log \
+    RUN rbenv-install 1.9.3-p545
+) &
 
-# local-lang plenv-install
-# local-lang rbenv-install
-# local-lang nvm-install
+TITLE "Install plenv and Perl 5.18.4"
+RUN install-plenv
+RUN plenv-install 5.18.4
+
+(
+  . ~/.sh/plenv-init
+  cpanm -n IO::All JSON JSON::XS XXX YAML YAML::Shell YAML::XS
+)
+
+TITLE "Done with ingy install script"

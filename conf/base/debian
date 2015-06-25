@@ -1,5 +1,6 @@
 # Basic essential debian pkgs:
 ack-grep
+docker.io
 exuberant-ctags
 htop
 libncurses-dev

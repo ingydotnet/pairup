@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -ex
+
+git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
+git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
+
+cat <<'...' > ~/.sh/rbenv-init
+# https://github.com/sstephenson/rbenv#installation
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
+...

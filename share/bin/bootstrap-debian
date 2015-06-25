@@ -1,19 +1,12 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
-source "$PAIRUP_ROOT/lib/pairup.bash"
-
-main() {
-  apt-get update --yes
-  apt-get install \
-    build-essential \
-    curl \
-    git-core \
-    libssl-dev \
-    weechat \
-    --yes
-}
-
-[ "$0" != "$BASH_SOURCE" ] || main "$@"
-
+apt-get update --yes
+apt-get install \
+  build-essential \
+  curl \
+  git-core \
+  libssl-dev \
+  weechat \
+  --yes

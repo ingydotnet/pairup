@@ -1,37 +1,29 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
 source "${PAIRUP_ROOT:??}/lib/pairup.bash"
 
-main() {
-  set -x
+TITLE "CPAN Installer:"
 
-  TITLE "CPAN Installer:"
+# apt-get install requested packages:
+modules="$(
+  cat $PAIRUP_ROOT/conf/cpan |
+    grep -Ev '\#' |
+    grep -Ev '^$' |
+    sort | uniq
+)"
+massive="$(echo "$modules" | grep -E '^Dist::' || true)"
+modules="$(echo "$modules" | grep -Ev '^Dist::' || true)"
 
-  local modules= massive=
+TITLE "List of CPAN modules to install:"
+echo "Installing these CPAN modules:"
+echo "$modules"
+echo "$massive"
 
-  # apt-get install requested packages:
-  modules="$(
-    cat $PAIRUP_ROOT/conf/cpan |
-      grep -Ev '\#' |
-      grep -Ev '^$' |
-      sort | uniq
-  )"
-  massive="$(echo "$modules" | grep -E '^Dist::' || true)"
-  modules="$(echo "$modules" | grep -Ev '^Dist::' || true)"
+TITLE "Install requested CPAN modules:"
+for module in $modules $massive; do
+  cpanm -n -f $module || true
+done
 
-  TITLE "List of CPAN modules to install:"
-  echo "Installing these CPAN modules:"
-  echo "$modules"
-  echo "$massive"
-
-  TITLE "Install requested CPAN modules:"
-  for module in $modules $massive; do
-    cpanm -n -f $module || true
-  done
-
-  TITLE "DONE! install-cpan-modules is complete."
-}
-
-[ "$0" != "$BASH_SOURCE" ] || main "$@"
+TITLE "DONE! install-cpan-modules is complete."
