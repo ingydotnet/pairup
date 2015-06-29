@@ -74,19 +74,19 @@ main() {
   # server setup. This is the only time you need to enter the password. All
   # pubkey afterwards:
   if [ "$root_user" == root ]; then
-    cat "$PairUp/keys/${admin_user%:*}/authorized_keys" |
+    cat "$LocalPairUp/keys/${admin_user%:*}/authorized_keys" |
       $ssh "$root_user@$vm_address" \
       "cat > ak; mkdir -p .ssh; chmod 700 .ssh; mv ak .ssh/authorized_keys"
   fi
 
   # Copy PairUp dir over to root:
-  rsync -az -e "$ssh" $PairUp/ "$root_user@$vm_address:$PairUp"
+  rsync -az -e "$ssh" $LocalPairUp/ "$root_user@$vm_address:$RemotePairUp"
 
   # Run the interactive root script:
-  $ssh -t "$root_user@$vm_address" $sudo bash "$PairUp/root-setup"
+  $ssh -t "$root_user@$vm_address" $sudo bash "$RemotePairUp/root-setup"
 
   # Run the interactive admin_user script:
-  $ssh -t "${admin_user%:*}@$vm_address" bash "$PairUp/admin-setup" \
+  $ssh -t "${admin_user%:*}@$vm_address" bash "$RemotePairUp/admin-setup" \
     || true   # Show reconnect msg if the tmux fails
 
   # \oXo/
@@ -94,7 +94,7 @@ main() {
   # \oXo/
 
   # Tell admin user how to reconnect when they leave tmux session:
-  cat $PairUp/reconnect
+  cat $LocalPairUp/reconnect
 }
 
 # cd to the pairup repo directory:
@@ -187,14 +187,14 @@ get-opts() {
   fi
 }
 
-# Copy everything the server will need into $PairUp/ and make sure both users
-# have a public key:
+# Copy everything the server will need into $RemotePairUp/ and make sure both
+# users have a public key:
 build-config() {
-  [ ! -d "$PairUp" ] || rm -fr $PairUp
-  mkdir -p $PairUp
+  [ ! -d "$LocalPairUp" ] || rm -fr $LocalPairUp
+  mkdir -p $LocalPairUp
 
-  cat <<... > $PairUp/pairup-env
-export PAIRUP_ROOT=~/.PairUp
+  cat <<... > $LocalPairUp/pairup-env
+export PAIRUP_ROOT=$RemotePairUp
 export PAIRUP=true
 export PAIRUP_ADMIN="$admin_user"
 export PAIRUP_ROOT_USER="$root_user"
@@ -207,7 +207,7 @@ export PATH="\
 \$PATH"
 ...
 
-cat <<... > $PairUp/reconnect
+cat <<... > $LocalPairUp/reconnect
 
 Connect to PairUp with:
 
@@ -215,51 +215,53 @@ Connect to PairUp with:
 
 ...
 
-cat <<... > $PairUp/motd
+  local pair_user="${pair_users[0]%:*}"
+cat <<... > $LocalPairUp/motd
 
 Welcome to your new PairUp server tmux session!
 
-Tell $pair_users to run this command:
+Tell '$pair_user' to run this command:
 
-    ssh -t $pair_users@$vm_address pairup
+    ssh -t $pair_user@$vm_address pairup
 
 --------------------------------------------------------------------------------
 ...
 
-  mkdir $PairUp/conf
-  mkdir $PairUp/user
-  mkdir $PairUp/project
-  mkdir $PairUp/keys
+  mkdir $LocalPairUp/conf
+  mkdir $LocalPairUp/user
+  mkdir $LocalPairUp/project
+  mkdir $LocalPairUp/keys
 
-  cp -p share/script/root-setup $PairUp/
-  cp -p share/script/admin-setup $PairUp/
-  cp -pr share/bin $PairUp/sbin
-  cp -pr bin $PairUp/bin
-  cp -pr lib $PairUp/lib
-  cp -pr conf/github-users $PairUp/conf/
-  cp -pr conf/base/* $PairUp/conf/
+  cp -p share/script/root-setup $LocalPairUp/
+  cp -p share/script/admin-setup $LocalPairUp/
+  cp -pr share/bin $LocalPairUp/sbin
+  cp -pr bin $LocalPairUp/bin
+  cp -pr lib $LocalPairUp/lib
+  cp -pr conf/github-users $LocalPairUp/conf/
+  cp -pr conf/base/* $LocalPairUp/conf/
 
-  chmod +x $PairUp/conf/install
+  chmod +x $LocalPairUp/conf/install
 
   # Take the default conf files and append the appropriate user conf files to
   # each one:
   for user in "$admin_user" "${pair_users[@]}"; do
     local unix_user="${user%:*}"
-    mkdir "$PairUp/keys/$unix_user"
+    mkdir "$LocalPairUp/keys/$unix_user"
 
     for file in conf... cpan debian github install known_hosts ssh-config; do
       if [ -e "conf/user/$unix_user/$file" ]; then
         if [ "$file" != known_hosts ]; then
-          echo -e "\n# User settings for '$unix_user':" >> "$PairUp/conf/$file"
+          echo -e "\n# User settings for '$unix_user':" >> \
+            "$LocalPairUp/conf/$file"
         fi
-        cat "conf/user/$unix_user/$file" >> "$PairUp/conf/$file"
+        cat "conf/user/$unix_user/$file" >> "$LocalPairUp/conf/$file"
       fi
     done
 
-    mkdir "$PairUp/user/$unix_user"
+    mkdir "$LocalPairUp/user/$unix_user"
     [[ -d "conf/user/$unix_user" ]] &&
       [[ -n "$(ls -A "conf/user/$unix_user")" ]] &&
-      cp -r conf/user/"$unix_user"/* "$PairUp/user/$unix_user/"
+      cp -r conf/user/"$unix_user"/* "$LocalPairUp/user/$unix_user/"
 
     assert-public-key
   done
@@ -277,7 +279,7 @@ assert-public-key() {
   fi
   if [ -z "$github_user" ]; then
     github_user="$(
-      grep -Esh "^$unix_user:" $PairUp/conf/github-users* |
+      grep -Esh "^$unix_user:" $LocalPairUp/conf/github-users* |
       head -n1 | cut -d: -f2
     )"
     github_user="${github_user:-$unix_user}"
@@ -296,21 +298,21 @@ assert-public-key() {
     cut -d'"' -f4
   )
   if [ -n "$rsa_keys" ]; then
-    echo "$rsa_keys" > "$PairUp/keys/$unix_user/authorized_keys"
+    echo "$rsa_keys" > "$LocalPairUp/keys/$unix_user/authorized_keys"
   fi
   if [ -n "$dsa_keys" ]; then
-    echo "$dsa_keys" > "$PairUp/keys/$unix_user/authorized_keys2"
+    echo "$dsa_keys" > "$LocalPairUp/keys/$unix_user/authorized_keys2"
   fi
-  if [ -e "$PairUp/user/$unix_user/authorized_keys" ]; then
-    cat "$PairUp/user/$unix_user/authorized_keys" >> \
-      "$PairUp/keys/$unix_user/authorized_keys"
+  if [ -e "$LocalPairUp/user/$unix_user/authorized_keys" ]; then
+    cat "$LocalPairUp/user/$unix_user/authorized_keys" >> \
+      "$LocalPairUp/keys/$unix_user/authorized_keys"
   fi
-  if [ -e "$PairUp/user/$unix_user/authorized_keys2" ]; then
-    cat "$PairUp/user/$unix_user/authorized_keys2" >> \
-      "$PairUp/keys/$unix_user/authorized_keys2"
+  if [ -e "$LocalPairUp/user/$unix_user/authorized_keys2" ]; then
+    cat "$LocalPairUp/user/$unix_user/authorized_keys2" >> \
+      "$LocalPairUp/keys/$unix_user/authorized_keys2"
   fi
-  [ -s "$PairUp/keys/$unix_user/authorized_keys" ] ||
-  [ -s "$PairUp/keys/$unix_user/authorized_keys2" ] ||
+  [ -s "$LocalPairUp/keys/$unix_user/authorized_keys" ] ||
+  [ -s "$LocalPairUp/keys/$unix_user/authorized_keys2" ] ||
     die "Can't find a public key for user '$unix_user:$github_user'"
   :
 }

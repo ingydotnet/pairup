@@ -21,11 +21,11 @@ fi
 
 mkdir -p /home/$user/.ssh
 chmod 700 /home/$user/.ssh
-cp $PairUp/keys/$user/authorized_keys* /home/$user/.ssh/
+cp $RemotePairUp/keys/$user/authorized_keys* /home/$user/.ssh/
 if $admin; then
   chown -R $user:admin /home/$user/.ssh
-  cp -r $PairUp /home/$user/
-  chown -R $user:admin /home/$user/$PairUp
+  cp -r $RemotePairUp /home/$user/
+  chown -R $user:admin $RemotePairUp
   echo "$user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 else
   chown -R $user:$user /home/$user/.ssh

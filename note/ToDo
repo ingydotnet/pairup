@@ -1,1 +1,3 @@
-- Move log files to PAIRUP_ROOT/log/
+- Test pair user connection
+- Disconnect and reconnect during setup
+

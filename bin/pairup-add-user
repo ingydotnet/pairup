@@ -11,13 +11,13 @@ main() {
   github_user="$2"
   user="$pair_user"
 
-  mkdir -p $PairUp/user/$pair_user
+  mkdir -p $RemotePairUp/user/$pair_user
   assert-public-key
 
   sudo adduser --disabled-password --gecos '' $pair_user
   sudo mkdir -p /home/$pair_user/.ssh
   sudo chmod 700 /home/$pair_user/.ssh
-  sudo cp $PairUp/user/$pair_user/authorized_keys* /home/$pair_user/.ssh/
+  sudo cp $RemotePairUp/user/$pair_user/authorized_keys* /home/$pair_user/.ssh/
   sudo chown -R "$pair_user":"$pair_user" /home/$pair_user/.ssh
 
   echo "New user '$pair_user' can join with:"

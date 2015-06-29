@@ -3,7 +3,7 @@
 set -e
 
 [ -n "$PAIRUP_TEST_RUN" ] ||
-  source ${PAIRUP_ROOT:=.PairUp}/pairup-env
+  source ${PAIRUP_ROOT:=/tmp/PairUp}/pairup-env
 source $PAIRUP_ROOT/lib/pairup.bash
 
 main() {
@@ -12,8 +12,6 @@ main() {
   set -x
 
   TITLE "Admin user setup:"
-  mkdir -p ~/.sh
-  cp $PAIRUP_ROOT/pairup-env ~/.sh/
 
   TITLE "Copy known_hosts and config to .ssh/:"
   cp $PAIRUP_ROOT/conf/known_hosts .ssh/known_hosts

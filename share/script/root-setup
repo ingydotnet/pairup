@@ -3,8 +3,9 @@
 set -e
 
 [ -n "$PAIRUP_TEST_RUN" ] ||
-  source ${PAIRUP_ROOT:=.PairUp}/pairup-env
+  source ${PAIRUP_ROOT:=/tmp/PairUp}/pairup-env
 source $PAIRUP_ROOT/lib/pairup.bash
+ln -fs $PAIRUP_ROOT/bin/pairup /usr/bin/pairup
 
 main() {
   local cmd= sudo= title= log= user=

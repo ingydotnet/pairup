@@ -2,7 +2,8 @@
 
 set -e
 
-export PairUp=.PairUp
+export LocalPairUp=.PairUp
+export RemotePairUp=/tmp/PairUp
 
 RUN() {
   local Cmd="$cmd" Title="$title" Sudo="$sudo" Log="$log"

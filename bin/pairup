@@ -6,22 +6,22 @@
 
 set -e
 
-source "${PAIRUP_ROOT:??}/lib/pairup.bash"
+source "/tmp/PairUp/lib/pairup.bash"
 
 main() {
   check_cmd "$@"
 
   tmux_sock=/tmp/pairup
-  motd=$PairUp/motd
-  debian_log_file=$PairUp/log/debian.log
-  github_log_file=$PairUp/log/github.log
-  cpan_log_file=$PairUp/log/cpan.log
-  install_log_file=$PairUp/log/install.log
+  motd=$RemotePairUp/motd
+  debian_log_file=$RemotePairUp/log/debian.log
+  github_log_file=$RemotePairUp/log/github.log
+  cpan_log_file=$RemotePairUp/log/cpan.log
+  install_log_file=$RemotePairUp/log/install.log
 
   tmux -S $tmux_sock attach || tmux -S $tmux_sock new \
   \
   ';' set-window-option -g automatic-rename off \
-  \
+  ';' send-keys "chmod 777 $tmux_sock" C-m \
   ';' rename-window "PairUp^" \
   ';' send-keys "pairup-motd; " C-m \
   ';' split-window -h -p 33 \
