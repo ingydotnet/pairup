@@ -3,7 +3,8 @@
 set -e
 
 export LocalPairUp=.PairUp
-export RemotePairUp=/tmp/PairUp
+export RemotePairUp=/usr/local/share/PairUp
+export TempPairUp=/tmp/PairUp
 
 RUN() {
   local cmd="${1:? RUN <command> required}"; shift

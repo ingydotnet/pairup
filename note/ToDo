@@ -1,2 +1,2 @@
 - gem install jist
-- Change /tmp/PairUp to /usr/share/PairUp
+- Fix Devel::Local under plenv

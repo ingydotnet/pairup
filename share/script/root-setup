@@ -3,8 +3,8 @@
 set -e
 
 [ -n "$PAIRUP_TEST_RUN" ] ||
-  source ${PAIRUP_ROOT:=/tmp/PairUp}/pairup-env
-source $PAIRUP_ROOT/lib/pairup.bash
+  source ${PAIRUP_TEMP:=/tmp/PairUp}/pairup-env
+source $PAIRUP_TEMP/lib/pairup.bash
 
 main() {
   local title= user=
@@ -13,7 +13,8 @@ main() {
 
   TITLE "Root user setup:"
 
-  ln -fs $PAIRUP_ROOT/bin/pairup /usr/bin/pairup
+  mv $TempPairUp $RemotePairUp
+  ln -fs $RemotePairUp/bin/pairup /usr/bin/pairup
 
   admin_user="${PAIRUP_ADMIN%:*}"
   title="Create admin user: '$admin_user'" \
@@ -25,7 +26,7 @@ main() {
   done
 
   TITLE "Copy known hosts to .ssh/:"
-  cp "$PAIRUP_ROOT/conf/known_hosts" .ssh/known_hosts
+  cp "$RemotePairUp/conf/known_hosts" .ssh/known_hosts
 
   title="Install bootstrapping Debian packages:" \
     RUN bootstrap-debian

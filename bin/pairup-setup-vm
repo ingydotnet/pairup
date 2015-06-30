@@ -80,10 +80,10 @@ main() {
   fi
 
   # Copy PairUp dir over to root:
-  rsync -az -e "$ssh" $LocalPairUp/ "$root_user@$vm_address:$RemotePairUp"
+  rsync -az -e "$ssh" $LocalPairUp/ "$root_user@$vm_address:$TempPairUp"
 
   # Run the interactive root script:
-  $ssh -t "$root_user@$vm_address" $sudo bash "$RemotePairUp/root-setup"
+  $ssh -t "$root_user@$vm_address" $sudo bash "$TempPairUp/root-setup"
 
   # Run the interactive admin_user script:
   $ssh -t "${admin_user%:*}@$vm_address" bash "$RemotePairUp/admin-setup" \
@@ -194,6 +194,7 @@ build-config() {
   mkdir -p $LocalPairUp
 
   cat <<... > $LocalPairUp/pairup-env
+export PAIRUP_TEMP=$TempPairUp
 export PAIRUP_ROOT=$RemotePairUp
 export PAIRUP=true
 export PAIRUP_ADMIN="$admin_user"
@@ -203,6 +204,7 @@ export PAIRUP_VMADDR="$vm_address"
 export PAIRUP_STARTED="$(date)"
 export PAIRUP_REPO="$pairup_repo"
 export PATH="\
+\$PAIRUP_TEMP/bin:\
 \$PAIRUP_ROOT/bin:\
 \$PATH"
 ...

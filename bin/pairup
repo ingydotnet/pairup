@@ -6,7 +6,7 @@
 
 set -e
 
-source "/tmp/PairUp/lib/pairup.bash"
+source "/usr/local/share/PairUp/lib/pairup.bash"
 
 main() {
   check_cmd "$@"

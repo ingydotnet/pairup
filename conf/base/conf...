@@ -3,11 +3,11 @@ install_method: symlink
 dots:
 - repo: git@github.com:PairUp/loop-dots.git
 - repo: git@github.com:PairUp/sane-dots.git
-#   - repo: git@github.com:PairUp/git-dots.git
-#   - repo: git@github.com:PairUp/misc-dots.git
-#   - repo: git@github.com:PairUp/pairup-dots.git
-#   - repo: git@github.com:PairUp/vim-dots.git
+- repo: git@github.com:PairUp/git-dots.git
+- repo: git@github.com:PairUp/misc-dots.git
+- repo: git@github.com:PairUp/pairup-dots.git
+- repo: git@github.com:PairUp/vim-dots.git
 # This one is broken currently
 # - repo: git@github.com:PairUp/unicode-dots.git
 - repo: git@github.com:PairUp/tmux-dots.git
-#   - repo: git@github.com:PairUp/weechat-dots.git
+- repo: git@github.com:PairUp/weechat-dots.git
