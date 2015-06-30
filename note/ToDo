@@ -1,3 +1,2 @@
-- Test pair user connection
-- Disconnect and reconnect during setup
-
+- gem install jist
+- Change /tmp/PairUp to /usr/share/PairUp

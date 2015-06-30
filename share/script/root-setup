@@ -5,14 +5,15 @@ set -e
 [ -n "$PAIRUP_TEST_RUN" ] ||
   source ${PAIRUP_ROOT:=/tmp/PairUp}/pairup-env
 source $PAIRUP_ROOT/lib/pairup.bash
-ln -fs $PAIRUP_ROOT/bin/pairup /usr/bin/pairup
 
 main() {
-  local cmd= sudo= title= log= user=
+  local title= user=
 
   set -x
 
   TITLE "Root user setup:"
+
+  ln -fs $PAIRUP_ROOT/bin/pairup /usr/bin/pairup
 
   admin_user="${PAIRUP_ADMIN%:*}"
   title="Create admin user: '$admin_user'" \

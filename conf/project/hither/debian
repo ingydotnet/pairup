@@ -1,0 +1,5 @@
+postgresql
+postgresql-server-dev-all
+python-virtualenv
+python2.7-dev
+

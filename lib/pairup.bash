@@ -6,20 +6,48 @@ export LocalPairUp=.PairUp
 export RemotePairUp=/tmp/PairUp
 
 RUN() {
-  local Cmd="$cmd" Title="$title" Sudo="$sudo" Log="$log"
-  cmd= title= sudo= log=
-  if [ -z "$Cmd" ]; then
-    Cmd="${PAIRUP_ROOT:??}/sbin/${1:?command required}"
-    shift
+  local cmd="${1:? RUN <command> required}"; shift
+  local Title="$title" Sudo="$sudo" Log="$log"
+  title= sudo= log=
+  local check= PATH="$RemotePairUp/sbin:$PATH"
+  if [[ "$cmd" =~ ^check:(.*) ]]; then
+    cmd="${BASH_REMATCH[1]}"
+    check="check-$cmd"
   fi
-  [ -z "$Title" ] || TITLE "$Title"
-  [ -z "$Sudo" ] || local Sudo='sudo -E'
+  if [ -n "$Title" ] && [ -z "$check" ]; then
+    TITLE "$Title"
+  fi
+  local SUDO=
+  if [ -n "$Sudo" ]; then
+    SUDO="sudo -E"
+    if [[ ! "$cmd" =~ / ]] && [ -e "$RemotePairUp/sbin/$cmd" ]; then
+      cmd="$RemotePairUp/sbin/$cmd"
+    fi
+  fi
+  if [ -n "$check" ]; then
+    while ! "$check" "$@"; do
+      sleep 10
+    done
+    title="$Title" sudo="$Sudo" log="$Log" RUN "$cmd" "$@"
+    return
+  fi
   if [ -n "$Log" ]; then
-    mkdir -p "$(dirname $Log)"
-    $Sudo "$Cmd" "$@" &>> "$Log"
+    $SUDO "$cmd" "$@" &>> "$(LOG $Log $cmd)"
   else
-    $Sudo "$Cmd" "$@"
+    $SUDO "$cmd" "$@"
   fi
+}
+
+LOG() {
+  local log="${1:??}" default="$2"
+  if [ "$log" == true ]; then
+    log="${default##*/}"
+  fi
+  if [[ ! "$log" =~ / ]]; then
+    log="$RemotePairUp/log/$log.log"
+  fi
+  mkdir -p "$(dirname $log)"
+  echo "$log"
 }
 
 TITLE() {
@@ -64,7 +92,7 @@ cwd: `pwd`
   true
 }
 
-continue?() {
+prompt_continue() {
   (
     set +x
     echo -n "Error. ctl-c to exit. Enter to continue."
@@ -73,8 +101,9 @@ continue?() {
 }
 
 export -f RUN
+export -f LOG
 export -f TITLE
 export -f tests_ok
 export -f die
 export -f carp
-export -f continue?
+export -f prompt_continue

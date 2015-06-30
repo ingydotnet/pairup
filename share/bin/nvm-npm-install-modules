@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -ex
+
+nvm-npm-install-modules() {
+  local VERSION=${1:??}; shift
+  local GLOBAL=''
+  if [ "$1" == -g ]; then
+    GLOBAL='-g'
+    shift
+  fi
+  TITLE "Install Node modules: '$@'"
+  (
+    . ~/.sh/nvm-init
+    nvm use $VERSION
+    npm install $GLOBAL "$@"
+  )
+}
+nvm-npm-install-modules "$@"

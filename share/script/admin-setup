@@ -18,29 +18,28 @@ main() {
   cp $PAIRUP_ROOT/conf/ssh-config .ssh/config
 
   TITLE "Install ... dotfile management setup:"
-  git clone git@github.com:sharpsaw/....git || continue?
+  git clone git@github.com:sharpsaw/....git || prompt_continue
   cp $PAIRUP_ROOT/conf/conf... .../conf
-  .../... update || continue?
-  .../... install || continue?
+  .../... update || prompt_continue
+  .../... install || prompt_continue
 
-  sudo=1 \
   title="Install common CPAN modules:" \
-  log="$PAIRUP_ROOT/log/cpan.log" \
+  sudo=true \
+  log=true \
     RUN install-cpan-modules &
 
-  sudo=1 \
   title="Install common Debian packages:" \
-  log="$PAIRUP_ROOT/log/debian.log" \
+  sudo=true \
+  log=true \
     RUN install-debian-pkgs &
 
   title="Clone common GitHub repos:" \
-  log="$PAIRUP_ROOT/log/github.log" \
+  log=true \
     RUN clone-github-repos &
 
   title="Run custom install script:" \
-  log="$PAIRUP_ROOT/log/install.log" \
-  cmd="$PAIRUP_ROOT/conf/install" \
-    RUN &
+  log='custom-install-script' \
+    RUN "$PAIRUP_ROOT/conf/install" &
 
   TITLE "Start the PairUp custom tmux setup:"
   bash -l "$PAIRUP_ROOT/bin/pairup" || true

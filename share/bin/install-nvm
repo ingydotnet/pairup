@@ -2,6 +2,10 @@
 
 set -ex
 
+[ ! -e ~/.nvm ] || exit 0
+
+TITLE "Install nvm"
+
 git clone https://github.com/creationix/nvm.git ~/.nvm &&
   (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`)
 

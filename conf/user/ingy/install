@@ -1,26 +1,12 @@
-TITLE "Install nvm and Node v0.10.24"
 RUN install-nvm
 RUN nvm-install stable
+RUN nvm-npm-install-modules stable -g coffee-script
 
-(
-  . ~/.sh/nvm-init
-  npm install -g coffee-script
-)
-
-TITLE "Install rbenv and Ruby 1.9.3-p545"
 RUN install-rbenv
-(
-  log=$PAIRUP_ROOT/log/ruby.log \
-    RUN rbenv-install 1.9.3-p545
-) &
+log=true RUN rbenv-install 1.9.3-p545 &
 
-TITLE "Install plenv and Perl 5.18.4"
 RUN install-plenv
-RUN plenv-install 5.18.4
-
-(
-  . ~/.sh/plenv-init
-  cpanm -n IO::All JSON JSON::XS XXX YAML YAML::Shell YAML::XS
-)
+log=true RUN plenv-install 5.18.4 &
+log=true RUN plenv-cpanm-install-modules 5.18.4 XXX
 
 TITLE "Done with ingy install script"

@@ -11,12 +11,8 @@ source "/tmp/PairUp/lib/pairup.bash"
 main() {
   check_cmd "$@"
 
+  export PATH="$RemotePairUp/bin:$PATH"
   tmux_sock=/tmp/pairup
-  motd=$RemotePairUp/motd
-  debian_log_file=$RemotePairUp/log/debian.log
-  github_log_file=$RemotePairUp/log/github.log
-  cpan_log_file=$RemotePairUp/log/cpan.log
-  install_log_file=$RemotePairUp/log/install.log
 
   tmux -S $tmux_sock attach || tmux -S $tmux_sock new \
   \

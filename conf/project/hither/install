@@ -1,0 +1,4 @@
+RUN install-nvm
+RUN nvm-install stable
+RUN nvm-npm-install-modules stable js-yaml pg-json-schema-export
+log=true RUN plenv-cpanm-install-modules 5.18.4 YAML::XS

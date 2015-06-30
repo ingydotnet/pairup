@@ -2,9 +2,14 @@
 
 set -ex
 
+INSTALL_VERSION="${1:?Node version required}"
+
+TITLE "Install NodeJS $INSTALL_VERSION (with nvm)"
+
 (
   source ~/.nvm/nvm.sh
-  nvm install ${1:?Node version required}
+  set +x
+  time nvm install $INSTALL_VERSION
 )
 
-echo "$1" > ~/.nvmrc
+echo "$INSTALL_VERSION" > ~/.nvmrc

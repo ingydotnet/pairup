@@ -11,12 +11,12 @@ user="${user%:*}"
 
 # Don't addgroup for HPCloud
 if $admin && [ "${PAIRUP_ROOT_USER:??}" == root ]; then
-  addgroup admin || continue?
+  addgroup admin || prompt_continue
 fi
 
-adduser --disabled-password --gecos '' $user || continue?
+adduser --disabled-password --gecos '' $user || prompt_continue
 if $admin; then
-  adduser $user admin || continue?
+  adduser $user admin || prompt_continue
 fi
 
 mkdir -p /home/$user/.ssh
@@ -24,7 +24,6 @@ chmod 700 /home/$user/.ssh
 cp $RemotePairUp/keys/$user/authorized_keys* /home/$user/.ssh/
 if $admin; then
   chown -R $user:admin /home/$user/.ssh
-  cp -r $RemotePairUp /home/$user/
   chown -R $user:admin $RemotePairUp
   echo "$user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 else

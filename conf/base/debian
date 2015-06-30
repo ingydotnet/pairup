@@ -1,5 +1,4 @@
 # Basic essential debian pkgs:
-ack-grep
 docker.io
 exuberant-ctags
 htop
@@ -7,6 +6,7 @@ libncurses-dev
 libtool
 perl-doc
 pkg-config
+silversearcher-ag
 tig
 tmux
 tree

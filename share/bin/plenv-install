@@ -2,8 +2,14 @@
 
 set -ex
 
+VERSION=${1:?Perl version required}
+
+TITLE "Install Perl $VERSION (with plenv)"
+
 (
   . ~/.sh/plenv-init
-  plenv install ${1:?Perl version required}
-  plenv global $1
+  time plenv install $VERSION
+  plenv global $VERSION
+  sudo chown -R $USER ~/.cpanm
+  PERL_CPANM_OPT='--notest' plenv install-cpanm
 )

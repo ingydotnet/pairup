@@ -149,7 +149,7 @@ get-opts() {
     local option="$1"; shift
     case "$option" in
       -a) admin_user="$1"; shift ;;
-      -p) project_list+=("$1") ;;
+      -p) project_list+=("$1"); shift ;;
       -A) die "AWS not tested yet" ;;
       -D) ;;
       -H)
@@ -264,6 +264,23 @@ Tell '$pair_user' to run this command:
       cp -r conf/user/"$unix_user"/* "$LocalPairUp/user/$unix_user/"
 
     assert-public-key
+  done
+
+  for project in "${project_list[@]}"; do
+    for file in conf... cpan debian github install known_hosts ssh-config; do
+      if [ -e "conf/project/$project/$file" ]; then
+        if [ "$file" != known_hosts ]; then
+          echo -e "\n# Project settings for '$project':" >> \
+            "$LocalPairUp/conf/$file"
+        fi
+        cat "conf/project/$project/$file" >> "$LocalPairUp/conf/$file"
+      fi
+    done
+
+    mkdir "$LocalPairUp/project/$project"
+    [[ -d "conf/project/$project" ]] &&
+      [[ -n "$(ls -A "conf/project/$project")" ]] &&
+      cp -r conf/project/"$project"/* "$LocalPairUp/project/$project/"
   done
 }
 

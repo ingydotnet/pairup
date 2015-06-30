@@ -2,8 +2,12 @@
 
 set -ex
 
+VERSION=${1:?Ruby version required}
+
+TITLE "Install Ruby $VERSION (with rbenv)"
+
 (
   . ~/.sh/rbenv-init
-  rbenv install ${1:?Ruby version required}
-  rbenv global $1
+  time rbenv install $VERSION
+  rbenv global $VERSION
 )

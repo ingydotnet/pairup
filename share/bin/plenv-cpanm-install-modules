@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -ex
+
+check-plenv-cpanm-install-modules() {
+  local VERSION=${1:??}; shift
+  VERSION="${VERSION//\./\\.}"
+  [[ "$(source ~/.sh/plenv-init && plenv version 2>&1)" =~ $VERSION ]] ||
+    return 1
+}
+
+plenv-cpanm-install-modules() {
+  local VERSION=${1:??}; shift
+  TITLE "Install CPAN modules for '$VERSION': '$@'"
+  (
+    . ~/.sh/plenv-init
+    plenv shell "$VERSION"
+    cpanm -n "$@"
+  )
+}
+
+log=true \
+  RUN check:plenv-cpanm-install-modules "$@"

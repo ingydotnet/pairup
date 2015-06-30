@@ -2,6 +2,10 @@
 
 set -ex
 
+[ ! -e ~/.plenv ] || exit 0
+
+TITLE "Install plenv"
+
 git clone git://github.com/tokuhirom/plenv.git ~/.plenv
 git clone git://github.com/tokuhirom/Perl-Build.git ~/.plenv/plugins/perl-build/
 
@@ -10,9 +14,3 @@ cat <<'...' > ~/.sh/plenv-init
 export PATH="$HOME/.plenv/bin:$PATH"
 eval "$(plenv init -)"
 ...
-
-(
-  source ~/.sh/plenv-init
-  [ -e ~/.cpanm ] && sudo chown -R $USER:$USER ~/.cpanm
-  PERL_CPANM_OPT='--notest' plenv install-cpanm
-)
