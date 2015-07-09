@@ -4,6 +4,7 @@ exuberant-ctags
 htop
 libncurses-dev
 libtool
+mosh
 perl-doc
 pkg-config
 silversearcher-ag
