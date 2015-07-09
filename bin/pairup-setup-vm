@@ -213,7 +213,7 @@ cat <<... > $LocalPairUp/reconnect
 
 Connect to PairUp with:
 
-    ssh -t "${admin_user%:*}@$vm_address" pairup
+    ssh -t ${admin_user%:*}@$vm_address pairup
 
 ...
 
