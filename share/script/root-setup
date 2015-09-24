@@ -3,8 +3,8 @@
 set -e
 
 [ -n "$PAIRUP_TEST_RUN" ] ||
-  source ${PAIRUP_TEMP:=/tmp/PairUp}/pairup-env
-source $PAIRUP_TEMP/lib/pairup.bash
+  source ${PAIRUP_ROOT:=/tmp/PairUp}/pairup-env
+source $PAIRUP_ROOT/lib/pairup.bash
 
 main() {
   local title= user=

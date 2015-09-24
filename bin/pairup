@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-# Setup a complex tmux environment for PairUpi. See:
+# Setup a complex tmux environment for PairUp. See:
 # - http://www.tofu.org/drupal/node/183
 # - http://robots.thoughtbot.com/a-tmux-crash-course
 
 set -e
 
-source "/usr/local/share/PairUp/lib/pairup.bash"
-
 main() {
+  source "/usr/local/share/PairUp/lib/pairup.bash"
+
   check_cmd "$@"
 
   export PATH="$RemotePairUp/bin:$PATH"
