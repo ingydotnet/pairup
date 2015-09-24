@@ -33,7 +33,7 @@ RUN() {
     return
   fi
   if [ -n "$Log" ]; then
-    $SUDO "$cmd" "$@" &>> "$(LOG $Log $cmd)"
+    $SUDO "$cmd" "$@" 2>&1 >> "$(LOG $Log $cmd)"
   else
     $SUDO "$cmd" "$@"
   fi
