@@ -2,11 +2,11 @@
 
 set -e
 
-[ -n "$PAIRUP_TEST_RUN" ] ||
-  source ${PAIRUP_ROOT:=/tmp/PairUp}/pairup-env
-source $PAIRUP_ROOT/lib/pairup.bash
-
 main() {
+  [ -n "$PAIRUP_TEST_RUN" ] ||
+    source ${PAIRUP_TEMP:=/tmp/PairUp}/pairup-env
+  source $PAIRUP_TEMP/lib/pairup.bash
+
   local title= user=
 
   set -x
