@@ -6,6 +6,66 @@ export LocalPairUp=.PairUp
 export RemotePairUp=/usr/local/share/PairUp
 export TempPairUp=/tmp/PairUp
 
+# Use the rsa public key under ./user/$unix_user/authorized_keys or attempt to
+# get one from GitHub, or error out:
+assert-public-key() {
+  if [ -e "$LocalPairUp" ]; then
+    local PairUp="$LocalPairUp"
+  elif [ -e "$TempPairUp" ]; then
+    local PairUp="$TempPairUp"
+  elif [ -e "$RemotePairUp" ]; then
+    local PairUp="$RemotePairUp"
+  else
+    die "Can't find $LocalPairUp or $TempPairUp or $RemotePairUp"
+  fi
+
+  local unix_user= github_user=
+  if [[ "$user" =~ : ]]; then
+    unix_user="${user%:*}"
+    github_user="${user#*:}"
+  else
+    unix_user="$user"
+  fi
+  if [ -z "$github_user" ]; then
+    github_user="$(
+      grep -Esh "^$unix_user:" $PairUp/conf/github-users* |
+      head -n1 | cut -d: -f2
+    )"
+    github_user="${github_user:-$unix_user}"
+  fi
+  local keys=$(
+    curl --silent "https://api.github.com/users/$github_user/keys"
+  )
+  local rsa_keys=$(
+    echo "$keys" |
+    grep -E '^    "key": "ssh-rsa' |
+    cut -d'"' -f4
+  )
+  local dsa_keys=$(
+    echo "$keys" |
+    grep -E '^    "key": "ssh-dss' |
+    cut -d'"' -f4
+  )
+  if [ -n "$rsa_keys" ]; then
+    echo "$rsa_keys" > "$PairUp/keys/$unix_user/authorized_keys"
+  fi
+  if [ -n "$dsa_keys" ]; then
+    echo "$dsa_keys" > "$PairUp/keys/$unix_user/authorized_keys2"
+  fi
+  if [ -e "$PairUp/user/$unix_user/authorized_keys" ]; then
+    cat "$PairUp/user/$unix_user/authorized_keys" >> \
+      "$PairUp/keys/$unix_user/authorized_keys"
+  fi
+  if [ -e "$PairUp/user/$unix_user/authorized_keys2" ]; then
+    cat "$PairUp/user/$unix_user/authorized_keys2" >> \
+      "$PairUp/keys/$unix_user/authorized_keys2"
+  fi
+  [ -s "$PairUp/keys/$unix_user/authorized_keys" ] ||
+  [ -s "$PairUp/keys/$unix_user/authorized_keys2" ] ||
+    die "Can't find a public key for user '$unix_user:$github_user'"
+  :
+}
+
 RUN() {
   local cmd="${1:? RUN <command> required}"; shift
   local Title="$title" Sudo="$sudo" Log="$log"
